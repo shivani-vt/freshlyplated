@@ -182,3 +182,9 @@
     border-right-color: var(--border);
   }
 }
+
+.recipe-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
