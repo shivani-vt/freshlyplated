@@ -17,6 +17,17 @@ function App() {
 
   }, []);
 
+  function deleteRecipe(id) {
+
+  fetch(`http://localhost:3001/recipes/${id}`, {
+    method: "DELETE"
+  });
+  setRecipes(
+    recipes.filter(recipe => recipe.id !== id)
+  );
+
+}
+
   return (
     <div>
       <h1>FreshlyPlated</h1>
@@ -26,6 +37,7 @@ function App() {
           <RecipeCard 
           recipe={recipe}
           key={recipe.id}
+          deleteRecipe={deleteRecipe}
           /> //creates a recipe card for each recipe 
         ))}
         </div>
