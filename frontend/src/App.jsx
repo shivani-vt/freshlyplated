@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import RecipeCard from "./components/RecipeCard";
 import "./App.css";
+import AddRecipeForm from "./components/AddRecipeForm";
 //useState gives a React component memory to store data that can change.
 // //useEffect - when the data changes using setRecipes(), React automatically re-renders the page.
 function App() {
@@ -32,6 +33,9 @@ function App() {
     <div>
       <h1>FreshlyPlated</h1>
       <p>My recipe collection</p>
+
+      <AddRecipeForm />
+
        <div className="recipe-container">
        {recipes.map(recipe => (
           <RecipeCard 
