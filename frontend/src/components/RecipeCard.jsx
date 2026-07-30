@@ -1,5 +1,5 @@
 import "./RecipeCard.css";
-function RecipeCard({recipe,deleteRecipe}) {
+function RecipeCard({recipe,deleteRecipe, updateStatus}) {
     return (
         <div className="recipe-card">
             <h2>{recipe.name}</h2>
@@ -20,6 +20,7 @@ function RecipeCard({recipe,deleteRecipe}) {
             <p>Cook time: {recipe.cook_time_minutes} minutes</p>
 
             <button onClick={() => deleteRecipe(recipe.id)}>Delete</button>
+            <button onClick={() => updateStatus(recipe.id, "cooking")}>Start Cooking</button>
 
             
 

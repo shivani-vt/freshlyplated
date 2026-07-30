@@ -27,7 +27,7 @@ function App() {
     recipes.filter(recipe => recipe.id !== id)
   );
 
-}
+  }
 
   return (
     <div>
@@ -42,11 +42,39 @@ function App() {
           recipe={recipe}
           key={recipe.id}
           deleteRecipe={deleteRecipe}
+          updateStatus={updateStatus}
+
           /> //creates a recipe card for each recipe 
         ))}
         </div>
     </div>
   );
+}
+
+function updateStatus(id, newStatus) {
+
+  fetch(`http://localhost:3001/recipes/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      status: newStatus
+    })
+  })
+  .then(response => response.json())
+  .then(updatedRecipe => {
+
+    //Go through every recipe. If this is the one we updated, replace it. Otherwise keep it.
+
+    setRecipes(
+      recipes.map(recipe =>
+        recipe.id === id ? updatedRecipe : recipe
+      )
+    );
+
+  });
+
 }
 
 export default App;
