@@ -49,15 +49,15 @@ app.get("/recipes", async (req, res) => {
 app.post("/recipes", async (req, res) => {
     try {
 //information from frontend is stored in req.body
-  const { name, status } = req.body;
+  const { name, status, prep_time_minutes, cook_time_minutes } = req.body;
 
   const result = await pool.query(
     `
-    INSERT INTO recipes (name, status)
-    VALUES ($1, $2)
+    INSERT INTO recipes (name, status, prep_time_minutes, cook_time_minutes)
+    VALUES ($1, $2, $3, $4)
     RETURNING *
     `,
-    [name, status]
+    [name, status, prep_time_minutes, cook_time_minutes]
   );
 
   res.json(result.rows[0]);
