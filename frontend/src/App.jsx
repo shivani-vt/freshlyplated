@@ -8,6 +8,7 @@ function App() {
 
   const [recipes, setRecipes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
   useEffect(() => {
     fetch("http://localhost:3001/recipes") //fetches data from backend
@@ -30,9 +31,18 @@ function App() {
 
   }
 
-  const filteredRecipes = recipes.filter(recipe =>
-  recipe.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
+  const filteredRecipes = recipes.filter(recipe => {
+    const matchesSearch = recipe.name
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
+
+  const matchesStatus =
+    selectedStatus === "all" ||
+    recipe.status === selectedStatus;
+
+  return matchesSearch && matchesStatus;
+
+});
 
   return (
     <div>
@@ -44,7 +54,16 @@ function App() {
       placeholder="Search recipes..."
       value={searchTerm}
       onChange={(event) => setSearchTerm(event.target.value)}
-/>
+      />
+      <select
+      value={selectedStatus}
+      onChange={(event) => setSelectedStatus(event.target.value)}
+      >
+        <option value="all">All</option>
+        <option value="planning">Planning</option>
+        <option value="cooking">Cooking</option>
+        <option value="completed">Completed</option>
+      </select>
 
       <AddRecipeForm />
 
