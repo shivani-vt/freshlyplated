@@ -7,6 +7,7 @@ import AddRecipeForm from "./components/AddRecipeForm";
 function App() {
 
   const [recipes, setRecipes] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:3001/recipes") //fetches data from backend
@@ -29,23 +30,37 @@ function App() {
 
   }
 
+  const filteredRecipes = recipes.filter(recipe =>
+  recipe.name.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
   return (
     <div>
       <h1>FreshlyPlated</h1>
       <p>My recipe collection</p>
 
+      <input
+      type="text"
+      placeholder="Search recipes..."
+      value={searchTerm}
+      onChange={(event) => setSearchTerm(event.target.value)}
+/>
+
       <AddRecipeForm />
 
        <div className="recipe-container">
-       {recipes.map(recipe => (
-          <RecipeCard 
-          recipe={recipe}
-          key={recipe.id}
-          deleteRecipe={deleteRecipe}
-          updateStatus={updateStatus}
-
-          /> //creates a recipe card for each recipe 
-        ))}
+       {filteredRecipes.length === 0 ? (
+        <p>No recipes found </p>
+        ) : (
+        filteredRecipes.map(recipe => (
+          <RecipeCard
+            key={recipe.id}
+            recipe={recipe}
+            deleteRecipe={deleteRecipe}
+            updateStatus={updateStatus}
+          />
+        ))
+      )}
         </div>
     </div>
   );
