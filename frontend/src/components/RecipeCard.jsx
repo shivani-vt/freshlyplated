@@ -1,8 +1,13 @@
 import "./RecipeCard.css";
+import { Link } from "react-router-dom";
+
 function RecipeCard({recipe,deleteRecipe, updateStatus}) {
     return (
         <div className="recipe-card">
+            <Link to={`/recipes/${recipe.id}`}>
             <h2>{recipe.name}</h2>
+            </Link>
+
 
             {recipe.status === "planning" && (
                 <p>📝 Planning</p>
