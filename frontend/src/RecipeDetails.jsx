@@ -50,7 +50,10 @@ function RecipeDetails() {
             {recipe.adjusted_recipe_text}
         </p>
 
+        <Link to={`/recipes/${recipe.id}/edit`}>Edit Recipe</Link>
+
     </div>
+    
   );
 }
 

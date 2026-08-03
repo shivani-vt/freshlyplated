@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function AddRecipeForm() {
+function AddRecipeForm({ fetchRecipes }) {
     const [recipeName, setRecipeName] = useState("");
     const [status, setStatus] = useState("planning");
     const [prepTime, setPrepTime] = useState("");
@@ -27,12 +27,19 @@ function AddRecipeForm() {
             cook_time_minutes: cookTime
     })
 })
-        .then(() => {
-            setRecipeName("");
-            setPrepTime("");
-            setCookTime("");
-            setStatus("planning");
-            });
+        .then(response => response.json())
+        .then(data => {
+
+          console.log(data);
+
+          fetchRecipes();
+
+          setRecipeName("");
+          setPrepTime("");
+          setCookTime("");
+          setStatus("planning");
+
+});
 
 
     }

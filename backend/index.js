@@ -100,21 +100,39 @@ app.get("/recipes/:id", async (req, res) => {
 
 //updating status of recipe and sending back to frontend 
 app.patch("/recipes/:id", async (req, res) => {
-  //use patch to update a recipe 
+
   try {
 
-    const { id } = req.params; //finds the ID of specific recipe
-    const { status } = req.body; //infromation from frontend stored in req.body
+    const { id } = req.params;
+
+    const {
+      name,
+      status,
+      prep_time_minutes,
+      cook_time_minutes
+    } = req.body;
+
 
     const result = await pool.query(
       `
       UPDATE recipes
-      SET status = $1
-      WHERE id = $2
-      RETURNING * 
-      `, //RETURNING * returns the updated data back to frontend 
-      [status, id]
+      SET 
+        name = $1,
+        status = $2,
+        prep_time_minutes = $3,
+        cook_time_minutes = $4
+      WHERE id = $5
+      RETURNING *
+      `,
+      [
+        name,
+        status,
+        prep_time_minutes,
+        cook_time_minutes,
+        id
+      ]
     );
+
 
     if (result.rows.length === 0) {
       return res.status(404).json({
@@ -122,7 +140,9 @@ app.patch("/recipes/:id", async (req, res) => {
       });
     }
 
+
     res.json(result.rows[0]);
+
 
   } catch (error) {
 
@@ -133,6 +153,7 @@ app.patch("/recipes/:id", async (req, res) => {
     });
 
   }
+
 });
 
 //to delete a recipe 

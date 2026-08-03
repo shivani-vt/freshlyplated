@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import RecipeCard from "./components/RecipeCard";
 import "./App.css";
 import AddRecipeForm from "./components/AddRecipeForm";
+import EditRecipe from "./EditRecipe";
 
 function App() {
 
@@ -12,13 +13,19 @@ function App() {
   const [selectedStatus, setSelectedStatus] = useState("all");
 
 
-  useEffect(() => {
-    fetch("http://localhost:3001/recipes")
-      .then(response => response.json())
-      .then(data => {
-        setRecipes(data);
-      });
+  function fetchRecipes() {
 
+  fetch("http://localhost:3001/recipes")
+    .then(response => response.json())
+    .then(data => {
+      setRecipes(data);
+    });
+
+  }
+
+
+  useEffect(() => {
+  fetchRecipes();
   }, []);
 
 
@@ -37,27 +44,32 @@ function App() {
 
   function updateStatus(id, newStatus) {
 
-    fetch(`http://localhost:3001/recipes/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        status: newStatus
-      })
+  const recipe = recipes.find(recipe => recipe.id === id);
+
+  fetch(`http://localhost:3001/recipes/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: recipe.name,
+      status: newStatus,
+      prep_time_minutes: recipe.prep_time_minutes,
+      cook_time_minutes: recipe.cook_time_minutes
     })
-    .then(response => response.json())
-    .then(updatedRecipe => {
+  })
+  .then(response => response.json())
+  .then(updatedRecipe => {
 
-      setRecipes(
-        recipes.map(recipe =>
-          recipe.id === id ? updatedRecipe : recipe
-        )
-      );
+    setRecipes(
+      recipes.map(recipe =>
+        recipe.id === id ? updatedRecipe : recipe
+      )
+    );
 
-    });
+  });
 
-  }
+}
 
 
   const filteredRecipes = recipes.filter(recipe => {
@@ -108,7 +120,8 @@ function App() {
       </select>
 
 
-      <AddRecipeForm />
+      <AddRecipeForm fetchRecipes={fetchRecipes} />
+
 
 
       <div className="recipe-container">
@@ -139,10 +152,15 @@ function App() {
         path="/recipes/:id"
         element={<RecipeDetails />}
     />
+      <Route
+        path="/recipes/:id/edit"
+        element={<EditRecipe />}
+    />
 
-  </Routes>
+    </Routes>
 
   );
+  
 }
 
 
