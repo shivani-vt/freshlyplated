@@ -109,7 +109,11 @@ app.patch("/recipes/:id", async (req, res) => {
       name,
       status,
       prep_time_minutes,
-      cook_time_minutes
+      cook_time_minutes,
+      tags,
+      original_recipe_link,
+      original_recipe_text,
+      adjusted_recipe_text
     } = req.body;
 
 
@@ -120,16 +124,25 @@ app.patch("/recipes/:id", async (req, res) => {
         name = $1,
         status = $2,
         prep_time_minutes = $3,
-        cook_time_minutes = $4
-      WHERE id = $5
-      RETURNING *
+        cook_time_minutes = $4,
+        tags = $5,
+        original_recipe_link = $6,
+        original_recipe_text = $7,
+        adjusted_recipe_text = $8
+      WHERE id = $9
+        RETURNING *
       `,
       [
         name,
         status,
         prep_time_minutes,
         cook_time_minutes,
+        tags,
+        original_recipe_link,
+        original_recipe_text,
+        adjusted_recipe_text,
         id
+  
       ]
     );
 
