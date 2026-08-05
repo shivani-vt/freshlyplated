@@ -1,0 +1,30 @@
+.edit-recipe {
+  max-width: 600px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.edit-recipe input,
+.edit-recipe textarea,
+.edit-recipe select {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.edit-recipe textarea {
+  min-height: 120px;
+}
+
+.edit-recipe button {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #333;
+  color: white;
+  font-size: 16px;
+}

@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import "./EditRecipe.css";
 
 function EditRecipe() {
 
@@ -16,6 +17,7 @@ function EditRecipe() {
   const [originalLink, setOriginalLink] = useState("");
   const [originalRecipe, setOriginalRecipe] = useState("");
   const [adjustedRecipe, setAdjustedRecipe] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
 
   useEffect(() => {
@@ -32,6 +34,7 @@ function EditRecipe() {
         setOriginalLink(data.original_recipe_link || "");
         setOriginalRecipe(data.original_recipe_text || "");
         setAdjustedRecipe(data.adjusted_recipe_text || "");
+        setImageUrl(data.image_url || "");
     });
 
   }, [id]);
@@ -56,7 +59,8 @@ function EditRecipe() {
       tags: tags,
       original_recipe_link: originalLink,
       original_recipe_text: originalRecipe,
-      adjusted_recipe_text: adjustedRecipe
+      adjusted_recipe_text: adjustedRecipe,
+      image_url: imageUrl
     })
 })
   .then(response => response.json())
@@ -76,7 +80,7 @@ function EditRecipe() {
 
   
   return (
-  <div>
+  <div className= "edit-recipe">
 
     <h1>Edit {recipe.name}</h1>
 
@@ -114,13 +118,22 @@ function EditRecipe() {
     <option value="cooking">Cooking</option>
     <option value="completed">Completed</option>
     </select>
-    <label>Tags</label>
 
+    <label>Tags</label>
     <input
         type="text"
         value={tags}
         onChange={(event) => setTags(event.target.value)}
         placeholder="chicken, indian, dinner"
+    />
+
+    <label>Image URL</label>
+
+    <input
+        type="text"
+        value={imageUrl}
+        onChange={(event) => setImageUrl(event.target.value)}
+        placeholder="https://..."
     />
     <label>Original Recipe Link</label>
 
