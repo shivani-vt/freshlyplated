@@ -5,6 +5,7 @@ function AddRecipeForm({ fetchRecipes }) {
     const [status, setStatus] = useState("planning");
     const [prepTime, setPrepTime] = useState("");
     const [cookTime, setCookTime] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
 
     function handleSubmit() {
         //sending data to backend's recipe route
@@ -12,7 +13,8 @@ function AddRecipeForm({ fetchRecipes }) {
             name: recipeName,
             status: status,
             prep_time_minutes: prepTime,
-            cook_time_minutes: cookTime
+            cook_time_minutes: cookTime,
+            image_url: imageUrl
         });
 
         fetch("http://localhost:3001/recipes", {
@@ -24,7 +26,8 @@ function AddRecipeForm({ fetchRecipes }) {
             name: recipeName,
             status: status,
             prep_time_minutes: prepTime,
-            cook_time_minutes: cookTime
+            cook_time_minutes: cookTime,
+            image_url: imageUrl
     })
 })
         .then(response => response.json())
@@ -37,12 +40,14 @@ function AddRecipeForm({ fetchRecipes }) {
           setRecipeName("");
           setPrepTime("");
           setCookTime("");
+          setImageUrl("");
           setStatus("planning");
 
 });
 
 
     }
+  
   return (
     <div>
       <h2>Add Recipe</h2>
@@ -74,6 +79,15 @@ function AddRecipeForm({ fetchRecipes }) {
      <input type="number"
       value={cookTime}
        onChange={(event) => setCookTime(event.target.value)} />
+
+      <label>Image URL</label>
+
+      <input
+      type="text"
+      value={imageUrl}
+      onChange={(event) => setImageUrl(event.target.value)}
+      placeholder="https://..."
+      />
 
  
       <button onClick={handleSubmit}>Add Recipe</button>

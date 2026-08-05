@@ -49,15 +49,15 @@ app.get("/recipes", async (req, res) => {
 app.post("/recipes", async (req, res) => {
     try {
 //information from frontend is stored in req.body
-  const { name, status, prep_time_minutes, cook_time_minutes } = req.body;
+  const { name, status, prep_time_minutes, cook_time_minutes, image_url } = req.body;
 
   const result = await pool.query(
     `
-    INSERT INTO recipes (name, status, prep_time_minutes, cook_time_minutes)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO recipes (name, status, prep_time_minutes, cook_time_minutes, image_url)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *
     `,
-    [name, status, prep_time_minutes, cook_time_minutes]
+    [name, status, prep_time_minutes, cook_time_minutes, image_url]
   );
 
   res.json(result.rows[0]);
@@ -113,7 +113,8 @@ app.patch("/recipes/:id", async (req, res) => {
       tags,
       original_recipe_link,
       original_recipe_text,
-      adjusted_recipe_text
+      adjusted_recipe_text,
+      image_url
     } = req.body;
 
 
@@ -128,8 +129,9 @@ app.patch("/recipes/:id", async (req, res) => {
         tags = $5,
         original_recipe_link = $6,
         original_recipe_text = $7,
-        adjusted_recipe_text = $8
-      WHERE id = $9
+        adjusted_recipe_text = $8,
+        image_url = $9
+      WHERE id = $10
         RETURNING *
       `,
       [
@@ -141,6 +143,7 @@ app.patch("/recipes/:id", async (req, res) => {
         original_recipe_link,
         original_recipe_text,
         adjusted_recipe_text,
+        image_url,
         id
   
       ]

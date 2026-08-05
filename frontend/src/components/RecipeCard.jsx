@@ -5,6 +5,12 @@ function RecipeCard({ recipe, deleteRecipe, updateStatus }) {
   return (
     <div className="recipe-card">
 
+        {recipe.image_url && (
+            <img 
+                src={recipe.image_url}
+                alt={recipe.name}
+            />
+        )}
       <Link 
         to={`/recipes/${recipe.id}`}
         className="recipe-title"
