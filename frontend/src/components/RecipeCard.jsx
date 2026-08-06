@@ -50,22 +50,26 @@ function RecipeCard({ recipe, deleteRecipe, updateStatus }) {
 
 
       {recipe.tags && (
-        <p className="recipe-tags">
-          🏷 {recipe.tags}
-        </p>
+        <div className="recipe-tags">
+          {recipe.tags.split(",").map((tag, index) => (
+            <span key={index} className="tag">
+              {tag.trim()}
+            </span>
+          ))}
+        </div>
       )}
 
 
       <div className="recipe-buttons">
 
-        <button 
+        <button className="cook-button"
           onClick={() => updateStatus(recipe.id, "cooking")}
         >
           Start Cooking
         </button>
 
         <Link to={`/recipes/${recipe.id}/edit`}>
-        <button>Edit</button>
+        <button className="edit-button">Edit</button>
         </Link>
 
 

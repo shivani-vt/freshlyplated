@@ -70,24 +70,40 @@ function App() {
   });
 
 }
+const totalRecipes = recipes.length;
+
+const planningCount = recipes.filter(
+  recipe => recipe.status === "planning"
+).length;
+
+const cookingCount = recipes.filter(
+  recipe => recipe.status === "cooking"
+).length;
+
+const completedCount = recipes.filter(
+  recipe => recipe.status === "completed"
+).length;
 
 
-  const filteredRecipes = recipes.filter(recipe => {
 
-    const matchesSearch = recipe.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+const filteredRecipes = recipes.filter(recipe => {
 
-
-    const matchesStatus =
-      selectedStatus === "all" ||
-      recipe.status === selectedStatus;
+  const matchesSearch = recipe.name
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
 
 
-    return matchesSearch && matchesStatus;
+  const matchesStatus =
+    selectedStatus === "all" ||
+    recipe.status === selectedStatus;
 
-  });
 
+  return matchesSearch && matchesStatus;
+
+});
+
+
+  
 
   return (
     <Routes>
@@ -97,8 +113,16 @@ function App() {
       element={
     <div>
 
-      <h1>FreshlyPlated</h1>
-      <p>My recipe collection</p>
+      <div className="intro">
+
+      <h1>FreshlyPlated 🍽️</h1>
+
+      <p>
+        Healthy recipes, takeaway favourites,
+        and meal inspiration.
+      </p>
+
+      </div>
 
 
       <input
@@ -119,10 +143,38 @@ function App() {
         <option value="completed">Completed</option>
       </select>
 
+    <div className="stats-container">
 
-      <AddRecipeForm fetchRecipes={fetchRecipes} />
+      <div className="stat-card">
+        <h3>📚</h3>
+        <p>Total Recipes</p>
+        <h2>{totalRecipes}</h2>
+        </div>
+
+      <div className="stat-card">
+        <h3>📝</h3>
+        <p>Planning</p>
+        <h2>{planningCount}</h2>
+      </div>
+
+      <div className="stat-card">
+        <h3>🔥</h3>
+        <p>Cooking</p>
+        <h2>{cookingCount}</h2>
+      </div>
+
+      <div className="stat-card">
+        <h3>✅</h3>
+        <p>Completed</p>
+        <h2>{completedCount}</h2>
+        </div>
+
+    </div>
 
 
+      <div className="add-recipe-section">
+        <AddRecipeForm fetchRecipes={fetchRecipes} />
+      </div>
 
       <div className="recipe-container">
 

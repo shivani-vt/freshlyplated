@@ -19,42 +19,84 @@ function RecipeDetails() {
   }
 
     return (
-         <div>
-            <Link to="/">
-            ← Back to recipes
-            </Link>
+  <div className="recipe-details">
 
-      <h1>{recipe.name}</h1>
+    <Link to="/">
+      ← Back to recipes
+    </Link>
 
-      <p>Status: {recipe.status}</p>
 
-      <p>
-        Prep time: {recipe.prep_time_minutes} minutes
-      </p>
+    {recipe.image_url && (
+      <img
+        className="recipe-details-image"
+        src={recipe.image_url}
+        alt={recipe.name}
+      />
+    )}
 
-      <p>
-        Cook time: {recipe.cook_time_minutes} minutes
-      </p>
 
-        <p>
-        Tags: {recipe.tags}     
-        </p>
+    <h1>{recipe.name}</h1>
 
-        <h2>Original Recipe</h2>
-        <p>
-            {recipe.original_recipe_text}
-        </p>
 
-        <h2>FreshlyPlated Version</h2>
-        <p>
-            {recipe.adjusted_recipe_text}
-        </p>
+    <div className="details-stats">
 
-        <Link to={`/recipes/${recipe.id}/edit`}>Edit Recipe</Link>
+      <div>
+        <p>⏱ Prep Time</p>
+        <h3>{recipe.prep_time_minutes} mins</h3>
+      </div>
+
+
+      <div>
+        <p>🔥 Cook Time</p>
+        <h3>{recipe.cook_time_minutes} mins</h3>
+      </div>
+
+
+      <div>
+        <p>Status</p>
+        <h3>{recipe.status}</h3>
+      </div>
 
     </div>
-    
-  );
+
+
+    {recipe.tags && (
+      <div className="recipe-details-tags">
+        {recipe.tags.split(",").map((tag, index) => (
+          <span key={index}>
+            {tag.trim()}
+          </span>
+        ))}
+      </div>
+    )}
+
+
+
+    <section>
+      <h2>Original Recipe</h2>
+      <p>
+        {recipe.original_recipe_text}
+      </p>
+    </section>
+
+
+
+    <section>
+      <h2>FreshlyPlated Version</h2>
+      <p>
+        {recipe.adjusted_recipe_text}
+      </p>
+    </section>
+
+
+
+    <Link to={`/recipes/${recipe.id}/edit`}>
+      Edit Recipe
+    </Link>
+
+
+  </div>
+);
 }
 
 export default RecipeDetails;
