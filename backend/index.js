@@ -114,7 +114,9 @@ app.patch("/recipes/:id", async (req, res) => {
       original_recipe_link,
       original_recipe_text,
       adjusted_recipe_text,
-      image_url
+      image_url,
+      ingredients,
+      method
     } = req.body;
 
 
@@ -130,8 +132,10 @@ app.patch("/recipes/:id", async (req, res) => {
         original_recipe_link = $6,
         original_recipe_text = $7,
         adjusted_recipe_text = $8,
-        image_url = $9
-      WHERE id = $10
+        image_url = $9,
+        ingredients =$10,
+        method = $11
+        WHERE id = $12
         RETURNING *
       `,
       [
@@ -144,6 +148,8 @@ app.patch("/recipes/:id", async (req, res) => {
         original_recipe_text,
         adjusted_recipe_text,
         image_url,
+        ingredients,
+        method,
         id
   
       ]

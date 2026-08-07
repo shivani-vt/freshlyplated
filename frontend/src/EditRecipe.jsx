@@ -18,6 +18,8 @@ function EditRecipe() {
   const [originalRecipe, setOriginalRecipe] = useState("");
   const [adjustedRecipe, setAdjustedRecipe] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [ingredients, setIngredients] = useState("");
+  const [method, setMethod] = useState("");
 
 
   useEffect(() => {
@@ -35,14 +37,15 @@ function EditRecipe() {
         setOriginalRecipe(data.original_recipe_text || "");
         setAdjustedRecipe(data.adjusted_recipe_text || "");
         setImageUrl(data.image_url || "");
+        setIngredients(data.ingredients || "");
+        setMethod(data.method || "");
     });
 
   }, [id]);
-
-
+  
   if (!recipe) {
-    return <p>Loading...</p>;
-  }
+  return <p>Loading...</p>;
+}
 
   function handleSave() {
 
@@ -60,7 +63,9 @@ function EditRecipe() {
       original_recipe_link: originalLink,
       original_recipe_text: originalRecipe,
       adjusted_recipe_text: adjustedRecipe,
-      image_url: imageUrl
+      image_url: imageUrl,
+      ingredients: ingredients,
+      method: method,
     })
 })
   .then(response => response.json())
@@ -80,7 +85,7 @@ function EditRecipe() {
 
   
   return (
-  <div className= "edit-recipe">
+    <div className= "edit-recipe">
 
     <h1>Edit {recipe.name}</h1>
 
@@ -142,6 +147,23 @@ function EditRecipe() {
         value={originalLink}
         onChange={(event) => setOriginalLink(event.target.value)}
     />
+    <label>Ingredients</label>
+
+    <textarea
+      value={ingredients}
+      onChange={(event) => setIngredients(event.target.value)}
+      placeholder="Chicken breast&#10;Yoghurt&#10;Spices"
+    />
+
+
+    <label>Cooking Method</label>
+
+    <textarea
+      value={method}
+      onChange={(event) => setMethod(event.target.value)}
+      placeholder="Step 1: Marinate chicken&#10;Step 2: Cook sauce"
+    />
+
     <label>Original Recipe</label>
 
     <textarea
