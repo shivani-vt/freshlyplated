@@ -213,6 +213,166 @@ app.delete("/recipes/:id", async (req, res) => {
   }
 });
 
+// Create a new content item
+app.post("/content-items", async (req, res) => {
+  try {
+
+    const {
+      recipe_id,
+      status,
+      platform,
+      cook_date,
+      edit_deadline,
+      upload_date,
+      hook,
+      caption,
+      hashtags,
+      views,
+      likes
+    } = req.body;
+
+    const result = await pool.query(
+      `
+      INSERT INTO content_items (
+        recipe_id,
+        status,
+        platform,
+        cook_date,
+        edit_deadline,
+        upload_date,
+        hook,
+        caption,
+        hashtags,
+        views,
+        likes
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      RETURNING *
+      `,
+      [
+        recipe_id,
+        status,
+        platform,
+        cook_date,
+        edit_deadline,
+        upload_date,
+        hook,
+        caption,
+        hashtags,
+        views || 0,
+        likes || 0
+      ]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to create content item"
+    });
+
+  }
+});
+// Get all content items
+app.get("/content-items", async (req, res) => {
+  try {
+
+    const result = await pool.query(
+      `
+      SELECT
+        content_items.*,
+        recipes.name AS recipe_name
+      FROM content_items
+      JOIN recipes
+        ON content_items.recipe_id = recipes.id
+      ORDER BY content_items.created_at DESC
+      `
+    );
+
+    res.json(result.rows);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to fetch content items"
+    });
+
+  }
+});
+app.get("/content-items/:id", async (req, res) => {
+  try {
+
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM content_items
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Content item not found"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to fetch content item"
+    });
+
+  }
+});
+
+app.patch("/content-items/:id", async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE content_items
+      SET status = $1,
+          updated_at = NOW()
+      WHERE id = $2
+      RETURNING *
+      `,
+      [status, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Content item not found"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to update content item"
+    });
+
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -5,6 +5,8 @@ import RecipeCard from "./components/RecipeCard";
 import "./App.css";
 import AddRecipeForm from "./components/AddRecipeForm";
 import EditRecipe from "./EditRecipe";
+import ContentTracker from "./pages/ContentTracker";
+import CreateContentItem from "./CreateContentItem";
 
 function App() {
 
@@ -207,6 +209,15 @@ const filteredRecipes = recipes.filter(recipe => {
       <Route
         path="/recipes/:id/edit"
         element={<EditRecipe />}
+    />
+
+      <Route
+        path="/content-tracker"
+        element={<ContentTracker />}
+    />
+      <Route
+        path="/content-items/new"
+        element={<CreateContentItem />}
     />
 
     </Routes>

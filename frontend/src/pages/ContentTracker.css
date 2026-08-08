@@ -1,0 +1,97 @@
+
+.content-tracker {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.content-tracker h1 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #222;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+}
+
+.content-card {
+  background: white;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.content-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+}
+
+.content-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.content-status {
+  background: #f2e8dc;
+  color: #7a4b2a;
+  padding: 7px 13px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.content-platform {
+  color: #777;
+  font-weight: 600;
+}
+
+.content-card h2 {
+  margin: 0 0 20px;
+  font-size: 1.5rem;
+  color: #222;
+}
+
+.content-dates {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+  margin-bottom: 20px;
+}
+
+.content-dates p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.content-hook,
+.content-caption {
+  margin-top: 18px;
+}
+
+.content-hook strong,
+.content-caption strong {
+  color: #333;
+}
+
+.content-hook p,
+.content-caption p {
+  color: #666;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.content-card h2 a {
+  color: #222;
+  text-decoration: none;
+}
+
+.content-card h2 a:hover {
+  color: #7a4b2a;
+}
