@@ -1,0 +1,114 @@
+.dashboard {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 30px;
+}
+
+.dashboard h1 {
+  font-size: 3rem;
+  margin-bottom: 5px;
+  color: #222;
+}
+
+.dashboard > p {
+  color: #777;
+  margin-bottom: 40px;
+}
+
+.dashboard-section {
+  margin-top: 30px;
+}
+
+.dashboard-section h2 {
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.stat-card p {
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.stat-card h3 {
+  font-size: 2.5rem;
+  margin: 0;
+  color: #7a4b2a;
+}
+
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.task-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.task-card h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.task-item {
+  padding: 15px 0;
+  border-top: 1px solid #eee;
+}
+
+.task-item strong {
+  color: #333;
+}
+
+.task-item p {
+  margin: 5px 0 0;
+  color: #777;
+}
+
+.upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.upcoming-card {
+  background: white;
+  padding: 20px 25px;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upcoming-card h3 {
+  margin: 0 0 5px;
+  color: #222;
+}
+
+.upcoming-card p {
+  margin: 5px 0;
+  color: #777;
+}
+
+.upcoming-dates {
+  text-align: right;
+}
+

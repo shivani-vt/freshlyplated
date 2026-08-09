@@ -7,6 +7,7 @@ import AddRecipeForm from "./components/AddRecipeForm";
 import EditRecipe from "./EditRecipe";
 import ContentTracker from "./pages/ContentTracker";
 import CreateContentItem from "./CreateContentItem";
+import Dashboard from "./Dashboard";
 
 function App() {
 
@@ -218,6 +219,10 @@ const filteredRecipes = recipes.filter(recipe => {
       <Route
         path="/content-items/new"
         element={<CreateContentItem />}
+    /> 
+    <Route
+      path="/dashboard"
+      element={<Dashboard />}
     />
 
     </Routes>
