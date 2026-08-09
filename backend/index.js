@@ -339,7 +339,6 @@ app.get("/content-items/:id", async (req, res) => {
 
 app.patch("/content-items/:id", async (req, res) => {
   try {
-
     const { id } = req.params;
     const { status } = req.body;
 
@@ -363,13 +362,208 @@ app.patch("/content-items/:id", async (req, res) => {
     res.json(result.rows[0]);
 
   } catch (error) {
-
     console.error(error);
 
     res.status(500).json({
       error: "Failed to update content item"
     });
+  }
+});
 
+
+// Create a shopping list from one or more recipes
+app.post("/shopping-lists/from-recipes", async (req, res) => {
+  try {
+    const { recipe_ids } = req.body;
+
+    if (!recipe_ids || recipe_ids.length === 0) {
+      return res.status(400).json({
+        error: "No recipe IDs provided"
+      });
+    }
+
+    // Get all ingredients for the selected recipes
+    const ingredientResult = await pool.query(
+      `
+      SELECT
+        ingredient_name,
+        quantity,
+        unit
+      FROM recipe_ingredients
+      WHERE recipe_id = ANY($1::int[])
+      `,
+      [recipe_ids]
+    );
+
+    // Get everything currently in the pantry
+    const pantryResult = await pool.query(
+      `
+      SELECT
+        ingredient_name,
+        quantity,
+        unit
+      FROM pantry_items
+      `
+    );
+
+    // Combine duplicate ingredients from multiple recipes
+    const combinedIngredients = {};
+
+    ingredientResult.rows.forEach((ingredient) => {
+      const key = `${ingredient.ingredient_name.toLowerCase()}_${ingredient.unit}`;
+
+      if (!combinedIngredients[key]) {
+        combinedIngredients[key] = {
+          ingredient_name: ingredient.ingredient_name,
+          quantity: Number(ingredient.quantity),
+          unit: ingredient.unit
+        };
+      } else {
+        combinedIngredients[key].quantity += Number(ingredient.quantity);
+      }
+    });
+
+    // Subtract pantry quantities
+    pantryResult.rows.forEach((pantryItem) => {
+      const key = `${pantryItem.ingredient_name.toLowerCase()}_${pantryItem.unit}`;
+
+      if (combinedIngredients[key]) {
+        combinedIngredients[key].quantity -= Number(pantryItem.quantity);
+      }
+    });
+
+    // Only keep ingredients that are actually needed
+    const shoppingItems = Object.values(combinedIngredients)
+      .filter(item => item.quantity > 0);
+
+    // Create the shopping list
+    const listResult = await pool.query(
+      `
+      INSERT INTO shopping_lists (name, status)
+      VALUES ($1, 'active')
+      RETURNING *
+      `,
+      ["Recipe Shopping List"]
+    );
+
+    const shoppingList = listResult.rows[0];
+
+    // Add each required ingredient to the shopping list
+    for (const item of shoppingItems) {
+      await pool.query(
+        `
+        INSERT INTO shopping_list_items
+          (shopping_list_id, ingredient_name, quantity, unit)
+        VALUES ($1, $2, $3, $4)
+        `,
+        [
+          shoppingList.id,
+          item.ingredient_name,
+          item.quantity,
+          item.unit
+        ]
+      );
+    }
+
+    // Get the shopping list items
+    const itemsResult = await pool.query(
+      `
+      SELECT *
+      FROM shopping_list_items
+      WHERE shopping_list_id = $1
+      ORDER BY ingredient_name
+      `,
+      [shoppingList.id]
+    );
+
+    res.json({
+      shopping_list: shoppingList,
+      items: itemsResult.rows
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to create shopping list"
+    });
+  }
+});
+
+// Get the latest shopping list
+app.get("/shopping-lists/latest", async (req, res) => {
+  try {
+    const listResult = await pool.query(
+      `
+      SELECT *
+      FROM shopping_lists
+      ORDER BY created_at DESC
+      LIMIT 1
+      `
+    );
+
+    if (listResult.rows.length === 0) {
+      return res.status(404).json({
+        error: "No shopping lists found"
+      });
+    }
+
+    const shoppingList = listResult.rows[0];
+
+    const itemsResult = await pool.query(
+      `
+      SELECT *
+      FROM shopping_list_items
+      WHERE shopping_list_id = $1
+      ORDER BY ingredient_name
+      `,
+      [shoppingList.id]
+    );
+
+    res.json({
+      shopping_list: shoppingList,
+      items: itemsResult.rows
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to fetch shopping list"
+    });
+  }
+});
+
+// Update whether a shopping list item has been checked
+app.patch("/shopping-list-items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { checked } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE shopping_list_items
+      SET checked = $1
+      WHERE id = $2
+      RETURNING *
+      `,
+      [checked, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Shopping list item not found"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to update shopping list item"
+    });
   }
 });
 

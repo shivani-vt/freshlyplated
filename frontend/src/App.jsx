@@ -8,6 +8,7 @@ import EditRecipe from "./EditRecipe";
 import ContentTracker from "./pages/ContentTracker";
 import CreateContentItem from "./CreateContentItem";
 import Dashboard from "./Dashboard";
+import ShoppingList from "./ShoppingList";
 
 function App() {
 
@@ -223,6 +224,10 @@ const filteredRecipes = recipes.filter(recipe => {
     <Route
       path="/dashboard"
       element={<Dashboard />}
+    />
+    <Route
+      path="/shopping-list"
+      element={<ShoppingList />}
     />
 
     </Routes>

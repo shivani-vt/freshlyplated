@@ -1,0 +1,47 @@
+.shopping-list-page {
+  padding: 30px;
+}
+
+.shopping-list-page h1 {
+  margin-bottom: 5px;
+}
+
+.shopping-list-page > p {
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.shopping-list {
+  max-width: 600px;
+}
+
+.shopping-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 10px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.shopping-item label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shopping-item input {
+  width: 18px;
+  height: 18px;
+}
+
+.shopping-item .checked {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.shopping-quantity {
+  color: #666;
+}
