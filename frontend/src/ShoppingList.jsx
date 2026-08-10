@@ -41,8 +41,8 @@ function ShoppingList() {
   const remainingItems = items.filter((item) => !item.checked);
 
   return (
-    <div className="shopping-list-page">
-      <h1>Shopping List</h1>
+  <div className="shopping-list-page">
+      <h1>Shopping List 🛒</h1>
 
       <p>
         {remainingItems.length}{" "}

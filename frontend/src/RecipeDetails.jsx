@@ -6,27 +6,53 @@ function RecipeDetails() {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
 
+  const handleAddToShoppingList = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3001/shopping-lists/from-recipes",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            recipe_ids: [id],
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create shopping list");
+      }
+
+      console.log("Shopping list created:", data);
+
+      alert("Recipe added to shopping list!");
+    } catch (error) {
+      console.error("Failed to create shopping list:", error);
+      alert("Failed to add recipe to shopping list.");
+    }
+  };
+
   useEffect(() => {
     fetch(`http://localhost:3001/recipes/${id}`)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         setRecipe(data);
       });
   }, [id]);
-
 
   if (!recipe) {
     return <p>Loading recipe...</p>;
   }
 
-
   return (
-    <div className="recipe-details">
-
+    <div>
       <Link to="/">
         ← Back to recipes
       </Link>
-
 
       {recipe.image_url && (
         <img
@@ -36,31 +62,24 @@ function RecipeDetails() {
         />
       )}
 
-
       <h1>{recipe.name}</h1>
 
-
       <div className="details-stats">
-
         <div>
           <p>⏱ Prep Time</p>
           <h3>{recipe.prep_time_minutes} mins</h3>
         </div>
-
 
         <div>
           <p>🔥 Cook Time</p>
           <h3>{recipe.cook_time_minutes} mins</h3>
         </div>
 
-
         <div>
           <p>Status</p>
           <h3>{recipe.status}</h3>
         </div>
-
       </div>
-
 
       {recipe.tags && (
         <div className="recipe-details-tags">
@@ -71,7 +90,6 @@ function RecipeDetails() {
           ))}
         </div>
       )}
-
 
       {recipe.ingredients && (
         <section>
@@ -84,10 +102,8 @@ function RecipeDetails() {
               </li>
             ))}
           </ul>
-
         </section>
       )}
-
 
       {recipe.method && (
         <section>
@@ -100,11 +116,8 @@ function RecipeDetails() {
               </li>
             ))}
           </ol>
-
         </section>
       )}
-
-
 
       <section>
         <h2>Original Recipe</h2>
@@ -114,8 +127,6 @@ function RecipeDetails() {
         </p>
       </section>
 
-
-
       <section>
         <h2>FreshlyPlated Version</h2>
 
@@ -124,13 +135,13 @@ function RecipeDetails() {
         </p>
       </section>
 
-
-
       <Link to={`/recipes/${recipe.id}/edit`}>
         Edit Recipe
       </Link>
 
-
+      <button onClick={handleAddToShoppingList}>
+        🛒 Add to Shopping List
+      </button>
     </div>
   );
 }

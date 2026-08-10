@@ -170,6 +170,241 @@ app.delete("/recipes/:id", async (req, res) => {
   }
 });
 
+// Create a shopping list from one or more recipes
+app.post("/shopping-lists/from-recipes", async (req, res) => {
+  try {
+    const { recipe_ids } = req.body;
+
+    if (!recipe_ids || recipe_ids.length === 0) {
+      return res.status(400).json({
+        error: "No recipe IDs provided"
+      });
+    }
+
+    // Get ingredients from selected recipes
+    const ingredientResult = await pool.query(
+      `
+      SELECT
+        ingredient_name,
+        quantity,
+        unit
+      FROM recipe_ingredients
+      WHERE recipe_id = ANY($1::int[])
+      `,
+      [recipe_ids]
+    );
+
+    // Get ingredients currently in pantry
+    const pantryResult = await pool.query(
+      `
+      SELECT
+        ingredient_name,
+        quantity,
+        unit
+      FROM pantry_items
+      `
+    );
+
+    // Normalise ingredient names
+    function normaliseIngredientName(name) {
+      const ingredient = name.toLowerCase().trim();
+
+      const aliases = {
+        onion: "onions",
+        onions: "onions",
+
+        garlic: "garlic",
+        "garlic cloves": "garlic",
+
+        tomato: "tomatoes",
+        tomatoes: "tomatoes",
+
+        potato: "potatoes",
+        potatoes: "potatoes",
+
+        pepper: "peppers",
+        peppers: "peppers"
+      };
+
+      return aliases[ingredient] || ingredient;
+    }
+
+    // Combine duplicate ingredients
+    const combinedIngredients = {};
+
+    ingredientResult.rows.forEach((ingredient) => {
+      const normalisedName = normaliseIngredientName(
+        ingredient.ingredient_name
+      );
+
+      const key = `${normalisedName}_${ingredient.unit}`;
+
+      if (!combinedIngredients[key]) {
+        combinedIngredients[key] = {
+          ingredient_name: normalisedName,
+          quantity: Number(ingredient.quantity),
+          unit: ingredient.unit
+        };
+      } else {
+        combinedIngredients[key].quantity += Number(
+          ingredient.quantity
+        );
+      }
+    });
+
+    
+
+    // Subtract pantry quantities
+    pantryResult.rows.forEach((pantryItem) => {
+      const normalisedName = normaliseIngredientName(
+        pantryItem.ingredient_name
+      );
+
+      const key = `${normalisedName}_${pantryItem.unit}`;
+
+      if (combinedIngredients[key]) {
+        combinedIngredients[key].quantity -= Number(
+          pantryItem.quantity
+        );
+      }
+    });
+
+    // Remove ingredients that are already fully covered by pantry
+    const shoppingItems = Object.values(combinedIngredients)
+      .filter(item => item.quantity > 0);
+
+    // Create shopping list
+    const listResult = await pool.query(
+      `
+      INSERT INTO shopping_lists (name, status)
+      VALUES ($1, 'active')
+      RETURNING *
+      `,
+      ["Recipe Shopping List"]
+    );
+
+    const shoppingList = listResult.rows[0];
+
+    // Add ingredients to shopping list
+    for (const item of shoppingItems) {
+      await pool.query(
+        `
+        INSERT INTO shopping_list_items
+          (shopping_list_id, ingredient_name, quantity, unit)
+        VALUES ($1, $2, $3, $4)
+        `,
+        [
+          shoppingList.id,
+          item.ingredient_name,
+          item.quantity,
+          item.unit
+        ]
+      );
+    }
+
+    // Get shopping list items
+    const itemsResult = await pool.query(
+      `
+      SELECT *
+      FROM shopping_list_items
+      WHERE shopping_list_id = $1
+      ORDER BY ingredient_name
+      `,
+      [shoppingList.id]
+    );
+
+    res.json({
+      shopping_list: shoppingList,
+      items: itemsResult.rows
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to create shopping list"
+    });
+  }
+});
+
+// Get the latest shopping list
+app.get("/shopping-lists/latest", async (req, res) => {
+  try {
+    const listResult = await pool.query(
+      `
+      SELECT *
+      FROM shopping_lists
+      ORDER BY created_at DESC
+      LIMIT 1
+      `
+    );
+
+    if (listResult.rows.length === 0) {
+      return res.status(404).json({
+        error: "No shopping list found"
+      });
+    }
+
+    const shoppingList = listResult.rows[0];
+
+    const itemsResult = await pool.query(
+      `
+      SELECT *
+      FROM shopping_list_items
+      WHERE shopping_list_id = $1
+      ORDER BY ingredient_name
+      `,
+      [shoppingList.id]
+    );
+
+    res.json({
+      shopping_list: shoppingList,
+      items: itemsResult.rows
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to fetch shopping list"
+    });
+  }
+});
+
+
+// Check or uncheck a shopping list item
+app.patch("/shopping-list-items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { checked } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE shopping_list_items
+      SET checked = $1
+      WHERE id = $2
+      RETURNING *
+      `,
+      [checked, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Shopping list item not found"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to update shopping list item"
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
