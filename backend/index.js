@@ -566,6 +566,66 @@ app.patch("/shopping-list-items/:id", async (req, res) => {
     });
   }
 });
+// Get all pantry items
+app.get("/pantry-items", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM pantry_items
+      ORDER BY ingredient_name
+      `
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to fetch pantry items"
+    });
+  }
+});
+
+
+// Add a new pantry item
+app.post("/pantry-items", async (req, res) => {
+  try {
+    const {
+      ingredient_name,
+      quantity,
+      unit
+    } = req.body;
+
+    if (!ingredient_name || !quantity || !unit) {
+      return res.status(400).json({
+        error: "Ingredient name, quantity and unit are required"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO pantry_items
+        (ingredient_name, quantity, unit)
+      VALUES ($1, $2, $3)
+      RETURNING *
+      `,
+      [
+        ingredient_name,
+        quantity,
+        unit
+      ]
+    );
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to add pantry item"
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -9,6 +9,7 @@ import ContentTracker from "./pages/ContentTracker";
 import CreateContentItem from "./CreateContentItem";
 import Dashboard from "./Dashboard";
 import ShoppingList from "./ShoppingList";
+import Pantry from "./Pantry";
 
 function App() {
   const [recipes, setRecipes] = useState([]);
@@ -315,6 +316,11 @@ function App() {
       <Route
         path="/shopping-list"
         element={<ShoppingList />}
+      />
+
+      <Route
+        path="/pantry"
+        element={<Pantry />}
       />
 
     </Routes>
