@@ -1,12 +1,9 @@
 .pantry-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 30px;
+  padding: 30px;
 }
 
 .pantry-page h1 {
   margin-bottom: 5px;
-  font-size: 32px;
 }
 
 .pantry-page > p {
@@ -14,41 +11,37 @@
   margin-bottom: 25px;
 }
 
+/* Add ingredient form */
+
 .pantry-form {
   display: flex;
   gap: 10px;
   margin-bottom: 30px;
-  max-width: 700px;
+  flex-wrap: wrap;
 }
 
 .pantry-form input {
-  padding: 12px;
+  padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 15px;
-}
-
-.pantry-form input:first-child {
-  flex: 2;
-}
-
-.pantry-form input:nth-child(2),
-.pantry-form input:nth-child(3) {
-  width: 120px;
+  font-size: 14px;
 }
 
 .pantry-form button {
-  padding: 12px 18px;
+  padding: 10px 16px;
   border: none;
   border-radius: 8px;
-  background: #222;
+  background: #4caf50;
   color: white;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .pantry-form button:hover {
-  opacity: 0.85;
+  opacity: 0.9;
 }
+
+/* Pantry list */
 
 .pantry-list {
   max-width: 700px;
@@ -56,21 +49,58 @@
 
 .pantry-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 18px 20px;
-  margin-bottom: 12px;
+  justify-content: space-between;
+  padding: 16px 20px;
+  margin-bottom: 10px;
   background: white;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+  border: 1px solid #ddd;
 }
+
+/* Ingredient name */
 
 .pantry-item span:first-child {
-  font-weight: 500;
-  text-transform: capitalize;
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+  color: #222;
 }
 
-.pantry-item span:last-child {
+/* Quantity */
+
+.pantry-item span:nth-child(2) {
+  flex: 1;
+  text-align: center;
   color: #666;
+}
+
+/* Edit and Delete buttons */
+
+.pantry-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: 20px;
+}
+
+.pantry-buttons button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pantry-buttons .edit-button {
+  background: #4caf50;
+  color: #222;
+}
+
+.pantry-buttons .delete-button {
+  background: #ff4d4d;
+  color: #222;
+}
+
+.pantry-buttons button:hover {
+  opacity: 0.85;
 }

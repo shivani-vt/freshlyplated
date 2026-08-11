@@ -627,6 +627,73 @@ app.post("/pantry-items", async (req, res) => {
   }
 });
 
+// Update a pantry item
+app.patch("/pantry-items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { ingredient_name, quantity, unit } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE pantry_items
+      SET ingredient_name = $1,
+          quantity = $2,
+          unit = $3
+      WHERE id = $4
+      RETURNING *
+      `,
+      [ingredient_name, quantity, unit, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Pantry item not found"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to update pantry item"
+    });
+  }
+});
+
+
+// Delete a pantry item
+app.delete("/pantry-items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      DELETE FROM pantry_items
+      WHERE id = $1
+      RETURNING *
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Pantry item not found"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to delete pantry item"
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
