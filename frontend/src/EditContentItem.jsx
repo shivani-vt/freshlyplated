@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-function CreateContentItem() {
+function EditContentItem() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [recipes, setRecipes] = useState([]);
 
   const [recipeId, setRecipeId] = useState("");
@@ -24,6 +28,32 @@ function CreateContentItem() {
       });
   }, []);
 
+  useEffect(() => {
+    fetch(`http://localhost:3001/content-items/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setRecipeId(data.recipe_id);
+        setStatus(data.status);
+        setPlatform(data.platform);
+        setCookDate(data.cook_date?.split("T")[0] || "");
+        setEditDeadline(
+          data.edit_deadline?.split("T")[0] || ""
+        );
+        setUploadDate(
+          data.upload_date?.split("T")[0] || ""
+        );
+        setHook(data.hook || "");
+        setCaption(data.caption || "");
+        setHashtags(data.hashtags || "");
+      })
+      .catch((error) => {
+        console.error(
+          "Failed to fetch content item:",
+          error
+        );
+      });
+  }, [id]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -39,9 +69,9 @@ function CreateContentItem() {
 
     try {
       const response = await fetch(
-        "http://localhost:3001/content-items",
+        `http://localhost:3001/content-items/${id}`,
         {
-          method: "POST",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
@@ -55,8 +85,6 @@ function CreateContentItem() {
             hook: hook,
             caption: caption,
             hashtags: hashtags,
-            views: 0,
-            likes: 0,
           }),
         }
       );
@@ -65,37 +93,27 @@ function CreateContentItem() {
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Failed to create content item"
+          data.error || "Failed to update content item"
         );
       }
 
-      console.log("Created content item:", data);
+      alert("Content item updated!");
 
-      alert("Content item created!");
-
-      setRecipeId("");
-      setStatus("planning");
-      setPlatform("TikTok");
-      setCookDate("");
-      setEditDeadline("");
-      setUploadDate("");
-      setHook("");
-      setCaption("");
-      setHashtags("");
+      navigate("/content-tracker");
     } catch (error) {
       console.error(
-        "Failed to create content item:",
+        "Failed to update content item:",
         error
       );
 
-      alert("Failed to create content item.");
+      alert("Failed to update content item.");
     }
   };
 
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <h1>Create Content Item</h1>
+        <h1>Edit Content Item</h1>
 
         <label>Recipe</label>
 
@@ -197,7 +215,7 @@ function CreateContentItem() {
           onChange={(event) =>
             setHook(event.target.value)
           }
-          placeholder="The easiest enchiladas you will ever make"
+          placeholder="The easiest recipe you'll ever make"
         />
 
         <label>Caption</label>
@@ -207,7 +225,7 @@ function CreateContentItem() {
           onChange={(event) =>
             setCaption(event.target.value)
           }
-          placeholder="Easy homemade enchiladas 🌯"
+          placeholder="Easy homemade recipe"
         />
 
         <label>Hashtags</label>
@@ -217,15 +235,24 @@ function CreateContentItem() {
           onChange={(event) =>
             setHashtags(event.target.value)
           }
-          placeholder="#foodtok #enchiladas #easyrecipes"
+          placeholder="#foodtok #easyrecipes"
         />
 
         <button type="submit">
-          Create Content
+          Save Changes
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            navigate("/content-tracker")
+          }
+        >
+          Cancel
         </button>
       </form>
     </div>
   );
 }
 
-export default CreateContentItem;
+export default EditContentItem;

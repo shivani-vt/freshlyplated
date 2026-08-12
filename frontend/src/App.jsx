@@ -10,6 +10,7 @@ import CreateContentItem from "./CreateContentItem";
 import Dashboard from "./Dashboard";
 import ShoppingList from "./ShoppingList";
 import Pantry from "./Pantry";
+import EditContentItem from "./EditContentItem";
 
 function App() {
   const [recipes, setRecipes] = useState([]);
@@ -321,6 +322,10 @@ function App() {
       <Route
         path="/pantry"
         element={<Pantry />}
+      />
+      <Route
+        path="/content-items/:id/edit"
+        element={<EditContentItem />}
       />
 
     </Routes>

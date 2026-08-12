@@ -5,6 +5,7 @@ import "./ContentTracker.css";
 
 function ContentTracker() {
   const [contentItems, setContentItems] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
   const handleStatusChange = (id, newStatus) => {
     fetch(`http://localhost:3001/content-items/${id}`, {
@@ -36,14 +37,66 @@ function ContentTracker() {
       });
   }, []);
 
+  const filteredItems = contentItems.filter((item) => {
+  return (
+    selectedStatus === "all" ||
+    item.status === selectedStatus
+  );
+});
+
   return (
     <div className="content-tracker">
 
       <h1>Content Tracker</h1>
+      <div className="content-filters">
+
+  <button
+  className={selectedStatus === "all" ? "active" : ""}
+  onClick={() => setSelectedStatus("all")}
+>
+    All
+  </button>
+
+  <button
+  className={selectedStatus === "planning" ? "active" : ""}
+  onClick={() => setSelectedStatus("planning")}
+>
+    Planning
+  </button>
+
+  <button
+  className={selectedStatus === "ready_to_cook" ? "active" : ""}
+  onClick={() => setSelectedStatus("ready_to_cook")}
+>
+    Ready to Cook
+  </button>
+
+  <button
+  className={selectedStatus === "editing" ? "active" : ""}
+  onClick={() => setSelectedStatus("editing")}
+>
+    Editing
+  </button>
+
+  <button
+  className={selectedStatus === "ready_to_upload" ? "active" : ""}
+  onClick={() => setSelectedStatus("ready_to_upload")}
+>
+    Ready to Upload
+  </button>
+
+  <button
+  className={selectedStatus === "published" ? "active" : ""}
+  onClick={() => setSelectedStatus("published")}
+>
+    Published
+  </button>
+
+</div>
 
       <div className="content-grid">
 
-        {contentItems.map((item) => (
+        {filteredItems.map((item) => (
 
           <div className="content-card" key={item.id}>
 
@@ -108,6 +161,13 @@ function ContentTracker() {
               <strong>Caption</strong>
               <p>{item.caption}</p>
             </div>
+
+            <Link
+              to={`/content-items/${item.id}/edit`}
+                className="edit-content-button"
+              >
+                Edit
+            </Link>
 
           </div>
 

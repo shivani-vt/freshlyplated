@@ -340,17 +340,48 @@ app.get("/content-items/:id", async (req, res) => {
 app.patch("/content-items/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+
+    const {
+      recipe_id,
+      status,
+      platform,
+      cook_date,
+      edit_deadline,
+      upload_date,
+      hook,
+      caption,
+      hashtags
+    } = req.body;
 
     const result = await pool.query(
       `
       UPDATE content_items
-      SET status = $1,
-          updated_at = NOW()
-      WHERE id = $2
+      SET
+        recipe_id = $1,
+        status = $2,
+        platform = $3,
+        cook_date = $4,
+        edit_deadline = $5,
+        upload_date = $6,
+        hook = $7,
+        caption = $8,
+        hashtags = $9,
+        updated_at = NOW()
+      WHERE id = $10
       RETURNING *
       `,
-      [status, id]
+      [
+        recipe_id,
+        status,
+        platform,
+        cook_date,
+        edit_deadline,
+        upload_date,
+        hook,
+        caption,
+        hashtags,
+        id
+      ]
     );
 
     if (result.rows.length === 0) {
@@ -369,7 +400,6 @@ app.patch("/content-items/:id", async (req, res) => {
     });
   }
 });
-
 
 // Create a shopping list from one or more recipes
 app.post("/shopping-lists/from-recipes", async (req, res) => {
