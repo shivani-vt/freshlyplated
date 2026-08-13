@@ -401,6 +401,37 @@ app.patch("/content-items/:id", async (req, res) => {
   }
 });
 
+// Delete a content item
+app.delete("/content-items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      DELETE FROM content_items
+      WHERE id = $1
+      RETURNING *
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Content item not found"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to delete content item"
+    });
+  }
+});
+
 // Create a shopping list from one or more recipes
 app.post("/shopping-lists/from-recipes", async (req, res) => {
   try {
@@ -720,6 +751,74 @@ app.delete("/pantry-items/:id", async (req, res) => {
 
     res.status(500).json({
       error: "Failed to delete pantry item"
+    });
+  }
+});
+
+// Get dashboard information
+app.get("/dashboard", async (req, res) => {
+  try {
+    // Count recipes
+    const recipesResult = await pool.query(
+      `
+      SELECT COUNT(*) AS count
+      FROM recipes
+      `
+    );
+
+    // Count pantry items
+    const pantryResult = await pool.query(
+      `
+      SELECT COUNT(*) AS count
+      FROM pantry_items
+      `
+    );
+
+    // Count content items
+    const contentResult = await pool.query(
+      `
+      SELECT COUNT(*) AS count
+      FROM content_items
+      `
+    );
+
+    // Count content that still needs to be completed
+    const pendingResult = await pool.query(
+      `
+      SELECT COUNT(*) AS count
+      FROM content_items
+      WHERE status != 'published'
+      `
+    );
+
+    // Get upcoming content
+    const upcomingResult = await pool.query(
+      `
+      SELECT
+        content_items.*,
+        recipes.name AS recipe_name
+      FROM content_items
+      JOIN recipes
+        ON content_items.recipe_id = recipes.id
+      WHERE upload_date >= CURRENT_DATE
+      ORDER BY upload_date ASC
+      LIMIT 5
+      `
+    );
+
+    res.json({
+      recipes: Number(recipesResult.rows[0].count),
+      pantryItems: Number(pantryResult.rows[0].count),
+      contentItems: Number(contentResult.rows[0].count),
+      pendingContent: Number(pendingResult.rows[0].count),
+      upcomingContent: upcomingResult.rows
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Failed to fetch dashboard data"
     });
   }
 });

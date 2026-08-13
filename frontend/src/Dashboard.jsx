@@ -5,6 +5,7 @@ function Dashboard() {
 
   const [recipes, setRecipes] = useState([]);
   const [contentItems, setContentItems] = useState([]);
+  const [pantryItems, setPantryItems] = useState([]);
 
 
   useEffect(() => {
@@ -20,6 +21,11 @@ function Dashboard() {
       .then(response => response.json())
       .then(data => {
         setContentItems(data);
+      });
+    fetch("http://localhost:3001/pantry-items")
+      .then(response => response.json())
+      .then(data => {
+       setPantryItems(data);
       });
 
   }, []);
@@ -83,6 +89,26 @@ function Dashboard() {
 
   });
 
+  const planningCount = contentItems.filter(
+  item => item.status === "planning"
+).length;
+
+const readyToCookCount = contentItems.filter(
+  item => item.status === "ready_to_cook"
+).length;
+
+const editingCount = contentItems.filter(
+  item => item.status === "editing"
+).length;
+
+const readyToUploadCount = contentItems.filter(
+  item => item.status === "ready_to_upload"
+).length;
+
+const publishedCount = contentItems.filter(
+  item => item.status === "published"
+).length;
+
 
   return (
 
@@ -127,10 +153,57 @@ function Dashboard() {
 
           </div>
 
+          <div className="stat-card">
+
+            <p>Pantry Items</p>
+
+            <h3>
+              {pantryItems.length}
+            </h3>
+
+          </div>
+
 
         </div>
 
       </section>
+
+      <section className="dashboard-section">
+
+  <h2>Content Progress</h2>
+
+  <div className="progress-grid">
+
+    <div className="progress-card">
+      <p>Planning</p>
+      <h3>{planningCount}</h3>
+    </div>
+
+    <div className="progress-card">
+      <p>Ready to Cook</p>
+      <h3>{readyToCookCount}</h3>
+    </div>
+
+    <div className="progress-card">
+      <p>Editing</p>
+      <h3>{editingCount}</h3>
+    </div>
+
+    <div className="progress-card">
+      <p>Ready to Upload</p>
+      <h3>{readyToUploadCount}</h3>
+    </div>
+
+    <div className="progress-card">
+      <p>Published</p>
+      <h3>{publishedCount}</h3>
+    </div>
+
+  </div>
+
+</section>
+
+
 
 
       {/* TODAY'S TASKS */}

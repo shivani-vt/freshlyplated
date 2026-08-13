@@ -139,3 +139,31 @@
 .edit-content-button:hover {
   opacity: 0.9;
 }
+
+.edit-content-button,
+.delete-content-button {
+  display: inline-block;
+  margin-top: 15px;
+  margin-right: 10px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.edit-content-button {
+  background: #4caf50;
+  color: white;
+}
+
+.delete-content-button {
+  background: #ff4d4d;
+  color: white;
+}
+
+.edit-content-button:hover,
+.delete-content-button:hover {
+  opacity: 0.9;
+}

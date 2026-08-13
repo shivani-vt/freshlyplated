@@ -44,6 +44,47 @@ function ContentTracker() {
   );
 });
 
+const handleDelete = async (id) => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this content item?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:3001/content-items/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const deletedItem = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        deletedItem.error || "Failed to delete content item"
+      );
+    }
+
+    setContentItems((currentItems) =>
+      currentItems.filter(
+        (item) => item.id !== deletedItem.id
+      )
+    );
+
+  } catch (error) {
+    console.error(
+      "Failed to delete content item:",
+      error
+    );
+
+    alert("Failed to delete content item.");
+  }
+};
+
   return (
     <div className="content-tracker">
 
@@ -168,6 +209,10 @@ function ContentTracker() {
               >
                 Edit
             </Link>
+            <button
+              className="delete-content-button"
+              onClick={() => handleDelete(item.id)}
+            >Delete</button>
 
           </div>
 
