@@ -1,106 +1,129 @@
-.pantry-page {
-  padding: 30px;
+.pantry-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+  text-align: left;
 }
 
-.pantry-page h1 {
-  margin-bottom: 5px;
-}
-
-.pantry-page > p {
-  color: #666;
-  margin-bottom: 25px;
-}
-
-/* Add ingredient form */
-
-.pantry-form {
-  display: flex;
-  gap: 10px;
+.pantry-header {
   margin-bottom: 30px;
-  flex-wrap: wrap;
 }
 
-.pantry-form input {
+.pantry-header h1 {
+  font-size: 2.2rem;
+  margin: 0 0 6px;
+  color: #222;
+}
+
+.pantry-header p {
+  color: #777;
+  margin: 0;
+}
+
+.pantry-form-card {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.pantry-form-card h3 {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.pantry-form-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 12px;
+}
+
+.pantry-form-grid input,
+.pantry-form-grid select {
   padding: 10px 12px;
-  border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 14px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
 }
 
-.pantry-form button {
-  padding: 10px 16px;
+.btn-add-pantry {
+  background: #7a4b2a;
+  color: white;
   border: none;
   border-radius: 8px;
-  background: #4caf50;
-  color: white;
+  padding: 10px 18px;
   font-weight: 600;
   cursor: pointer;
+  transition: opacity 0.2s;
 }
 
-.pantry-form button:hover {
+.btn-add-pantry:hover {
   opacity: 0.9;
 }
 
-/* Pantry list */
-
-.pantry-list {
-  max-width: 700px;
-}
-
-.pantry-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  margin-bottom: 10px;
+.pantry-list-card {
   background: white;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
-/* Ingredient name */
+.pantry-list-card h3 {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  color: #333;
+}
 
-.pantry-item span:first-child {
-  flex: 1;
-  text-align: center;
-  font-weight: 600;
+.pantry-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pantry-table th {
+  background: #faf9f6;
+  padding: 12px;
+  font-size: 0.85rem;
+  color: #777;
+  text-transform: uppercase;
+  border-bottom: 2px solid #eae8e3;
+  text-align: left;
+}
+
+.pantry-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f0eee9;
+  color: #444;
+}
+
+.item-name-cell {
+  font-weight: 500;
   color: #222;
+  text-transform: capitalize;
 }
 
-/* Quantity */
-
-.pantry-item span:nth-child(2) {
-  flex: 1;
-  text-align: center;
-  color: #666;
-}
-
-/* Edit and Delete buttons */
-
-.pantry-buttons {
-  display: flex;
-  gap: 8px;
-  margin-left: 20px;
-}
-
-.pantry-buttons button {
-  padding: 8px 12px;
+.btn-delete-stock {
+  background: none;
   border: none;
-  border-radius: 7px;
   cursor: pointer;
-  font-weight: 600;
+  font-size: 1rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
 }
 
-.pantry-buttons .edit-button {
-  background: #4caf50;
-  color: #222;
+.btn-delete-stock:hover {
+  opacity: 1;
 }
 
-.pantry-buttons .delete-button {
-  background: #ff4d4d;
-  color: #222;
+.empty-pantry-text {
+  text-align: center;
+  color: #999;
+  padding: 30px 0;
 }
 
-.pantry-buttons button:hover {
-  opacity: 0.85;
+@media (max-width: 768px) {
+  .pantry-form-grid {
+    grid-template-columns: 1fr;
+  }
 }

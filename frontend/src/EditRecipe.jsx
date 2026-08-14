@@ -114,16 +114,18 @@ function EditRecipe() {
     />
 
     <label>Status</label>
-
     <select
-        value={status}
-        onChange={(event) => setStatus(event.target.value)}
+      value={status}
+      onChange={(event) => setStatus(event.target.value)}
     >
-    <option value="planning">Planning</option>
-    <option value="cooking">Cooking</option>
-    <option value="completed">Completed</option>
+      <option value="planning">Planning</option>
+      <option value="ready_to_cook">Ready to Cook</option>
+      <option value="editing">Editing</option>
+      <option value="ready_to_upload">Ready to Upload</option>
+      <option value="published">Published</option>
     </select>
 
+    
     <label>Tags</label>
     <input
         type="text"

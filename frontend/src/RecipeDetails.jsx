@@ -139,7 +139,7 @@ function RecipeDetails() {
         Edit Recipe
       </Link>
 
-      <button onClick={handleAddToShoppingList}>
+      <button className="shopping-list-button" onClick={handleAddToShoppingList}>
         🛒 Add to Shopping List
       </button>
     </div>

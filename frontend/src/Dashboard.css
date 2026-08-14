@@ -25,9 +25,7 @@
 }
 
 
-/* =========================
-   QUICK STATS
-========================= */
+/*QUICK STATS*/
 
 .stats-grid {
   display: grid;
@@ -86,9 +84,7 @@
 }
 
 
-/* =========================
-   TODAY'S TASKS
-========================= */
+/*TODAY'S TASKS*/
 
 .tasks-grid {
   display: grid;
@@ -124,9 +120,7 @@
 }
 
 
-/* =========================
-   UPCOMING TASKS
-========================= */
+/*UPCOMING TASKS*/
 
 .upcoming-list {
   display: flex;
@@ -160,9 +154,7 @@
 }
 
 
-/* =========================
-   MOBILE
-========================= */
+/*MOBILE*/
 
 @media (max-width: 800px) {
 

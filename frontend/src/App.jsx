@@ -11,6 +11,8 @@ import Dashboard from "./Dashboard";
 import ShoppingList from "./ShoppingList";
 import Pantry from "./Pantry";
 import EditContentItem from "./EditContentItem";
+import CalendarView from "./CalendarView";
+import Navbar from "./components/Navbar";
 
 function App() {
   const [recipes, setRecipes] = useState([]);
@@ -40,30 +42,39 @@ function App() {
     );
   }
 
-  function updateStatus(id, newStatus) {
-    const recipe = recipes.find((recipe) => recipe.id === id);
+function updateStatus(id, newStatus) {
+  const recipe = recipes.find((recipe) => recipe.id === id);
+  if (!recipe) return;
 
-    fetch(`http://localhost:3001/recipes/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: recipe.name,
-        status: newStatus,
-        prep_time_minutes: recipe.prep_time_minutes,
-        cook_time_minutes: recipe.cook_time_minutes,
-      }),
+  fetch(`http://localhost:3001/recipes/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: recipe.name,
+      status: newStatus,
+      prep_time_minutes: recipe.prep_time_minutes,
+      cook_time_minutes: recipe.cook_time_minutes,
+      tags: recipe.tags,
+      original_recipe_link: recipe.original_recipe_link,
+      original_recipe_text: recipe.original_recipe_text,
+      adjusted_recipe_text: recipe.adjusted_recipe_text,
+      image_url: recipe.image_url,
+      ingredients: recipe.ingredients,
+      method: recipe.method,
+    }),
+  })
+    .then((response) => response.json())
+    .then((updatedRecipe) => {
+      setRecipes(
+        recipes.map((recipe) =>
+          recipe.id === id ? updatedRecipe : recipe
+        )
+      );
     })
-      .then((response) => response.json())
-      .then((updatedRecipe) => {
-        setRecipes(
-          recipes.map((recipe) =>
-            recipe.id === id ? updatedRecipe : recipe
-          )
-        );
-      });
-  }
+    .catch((error) => console.error("Error updating recipe status:", error));
+}
 
   function toggleRecipeSelection(id) {
     setSelectedRecipes((currentSelected) => {
@@ -147,6 +158,8 @@ function App() {
   });
 
   return (
+    <>
+    <Navbar />
     <Routes>
 
       <Route
@@ -328,7 +341,11 @@ function App() {
         element={<EditContentItem />}
       />
 
+      <Route path="/calendar" element={<CalendarView />} />
+    
+
     </Routes>
+      </>
   );
 }
 

@@ -2,298 +2,168 @@ import { useEffect, useState } from "react";
 import "./Pantry.css";
 
 function Pantry() {
-  const [items, setItems] = useState([]);
-
-  const [ingredientName, setIngredientName] = useState("");
+  const [pantryItems, setPantryItems] = useState([]);
+  const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [unit, setUnit] = useState("");
+  const [unit, setUnit] = useState("g");
+  const [loading, setLoading] = useState(true);
 
-  const [editingId, setEditingId] = useState(null);
-  const [editingIngredientName, setEditingIngredientName] = useState("");
-  const [editingQuantity, setEditingQuantity] = useState("");
-  const [editingUnit, setEditingUnit] = useState("");
+  const fetchPantry = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("http://localhost:3001/pantry-items");
+      const data = await res.json();
+      setPantryItems(data || []);
+    } catch (err) {
+      console.error("Failed to load pantry items:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetch("http://localhost:3001/pantry-items")
-      .then((response) => response.json())
-      .then((data) => {
-        setItems(data);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch pantry:", error);
-      });
+    fetchPantry();
   }, []);
 
-  const handleAddItem = async (event) => {
-    event.preventDefault();
+  const handleAddItem = async (e) => {
+    e.preventDefault();
 
-    if (!ingredientName || !quantity || !unit) {
-      alert("Please fill in all fields.");
+    if (!name.trim() || !quantity) {
+      alert("Please provide an ingredient name and quantity.");
       return;
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:3001/pantry-items",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ingredient_name: ingredientName,
-            quantity: Number(quantity),
-            unit: unit,
-          }),
-        }
-      );
+      const res = await fetch("http://localhost:3001/pantry-items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ingredient_name: name.trim(),
+          quantity: Number(quantity),
+          unit: unit.trim(),
+        }),
+      });
 
-      const data = await response.json();
+      if (!res.ok) throw new Error("Failed to add pantry item");
 
-      if (!response.ok) {
-        throw new Error(
-          data.error || "Failed to add pantry item"
-        );
-      }
+      const newItem = await res.json();
+      setPantryItems((prev) => [...prev, newItem].sort((a, b) => 
+        a.ingredient_name.localeCompare(b.ingredient_name)
+      ));
 
-      setItems((currentItems) => [...currentItems, data]);
-
-      setIngredientName("");
+      setName("");
       setQuantity("");
-      setUnit("");
-    } catch (error) {
-      console.error("Failed to add pantry item:", error);
-      alert("Failed to add pantry item.");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add item to pantry.");
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteItem = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:3001/pantry-items/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const res = await fetch(`http://localhost:3001/pantry-items/${id}`, {
+        method: "DELETE",
+      });
 
-      const deletedItem = await response.json();
+      if (!res.ok) throw new Error("Failed to delete item");
 
-      if (!response.ok) {
-        throw new Error(
-          deletedItem.error || "Failed to delete pantry item"
-        );
-      }
-
-      setItems((currentItems) =>
-        currentItems.filter(
-          (item) => item.id !== deletedItem.id
-        )
-      );
-    } catch (error) {
-      console.error("Failed to delete pantry item:", error);
+      setPantryItems((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error(err);
       alert("Failed to delete pantry item.");
     }
   };
 
-  const startEditing = (item) => {
-    setEditingId(item.id);
-    setEditingIngredientName(item.ingredient_name);
-    setEditingQuantity(item.quantity);
-    setEditingUnit(item.unit);
-  };
-
-  const cancelEditing = () => {
-    setEditingId(null);
-    setEditingIngredientName("");
-    setEditingQuantity("");
-    setEditingUnit("");
-  };
-
-  const handleEdit = async (id) => {
-    if (
-      !editingIngredientName ||
-      !editingQuantity ||
-      !editingUnit
-    ) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `http://localhost:3001/pantry-items/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ingredient_name: editingIngredientName,
-            quantity: Number(editingQuantity),
-            unit: editingUnit,
-          }),
-        }
-      );
-
-      const updatedItem = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          updatedItem.error || "Failed to update pantry item"
-        );
-      }
-
-      setItems((currentItems) =>
-        currentItems.map((item) =>
-          item.id === updatedItem.id
-            ? updatedItem
-            : item
-        )
-      );
-
-      cancelEditing();
-    } catch (error) {
-      console.error("Failed to update pantry item:", error);
-      alert("Failed to update pantry item.");
-    }
-  };
-
   return (
-    <div className="pantry-page">
-      <h1>Pantry 🏠</h1>
+    <div className="pantry-container">
+      <div className="pantry-header">
+        <h1>Pantry & Stock Inventory</h1>
+        <p>
+          Ingredients added here are automatically deducted when creating a
+          recipe shopping list.
+        </p>
+      </div>
 
-      <p>
-        Keep track of ingredients you already have at home.
-      </p>
+      {/* Add New Item Form */}
+      <form onSubmit={handleAddItem} className="pantry-form-card">
+        <h3>+ Add Stock</h3>
+        <div className="pantry-form-grid">
+          <input
+            type="text"
+            placeholder="Ingredient (e.g. Greek Yoghurt, Olive Oil)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
 
-      <form
-        className="pantry-form"
-        onSubmit={handleAddItem}
-      >
-        <input
-          type="text"
-          placeholder="Ingredient"
-          value={ingredientName}
-          onChange={(event) =>
-            setIngredientName(event.target.value)
-          }
-        />
+          <input
+            type="number"
+            placeholder="Qty"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            min="0.1"
+            step="any"
+            required
+          />
 
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={quantity}
-          onChange={(event) =>
-            setQuantity(event.target.value)
-          }
-        />
+          <select value={unit} onChange={(e) => setUnit(e.target.value)}>
+            <option value="g">g (grams)</option>
+            <option value="kg">kg (kilograms)</option>
+            <option value="ml">ml (millilitres)</option>
+            <option value="l">l (litres)</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+            <option value="pcs">pcs</option>
+            <option value="cans">cans</option>
+          </select>
 
-        <input
-          type="text"
-          placeholder="Unit"
-          value={unit}
-          onChange={(event) =>
-            setUnit(event.target.value)
-          }
-        />
-
-        <button type="submit">
-          Add Ingredient
-        </button>
+          <button type="submit" className="btn-add-pantry">
+            Add to Pantry
+          </button>
+        </div>
       </form>
 
-      <div className="pantry-list">
-        {items.length === 0 ? (
-          <p>Your pantry is empty.</p>
+      {/* Pantry List Table */}
+      <div className="pantry-list-card">
+        <h3>Current Stock ({pantryItems.length})</h3>
+
+        {loading ? (
+          <p className="loading-state">Loading pantry items...</p>
+        ) : pantryItems.length === 0 ? (
+          <p className="empty-pantry-text">
+            No items in your pantry. Add your basic ingredients above!
+          </p>
         ) : (
-          items.map((item) => (
-            <div
-              className="pantry-item"
-              key={item.id}
-            >
-              {editingId === item.id ? (
-                <div className="pantry-edit-form">
-
-                  <input
-                    type="text"
-                    value={editingIngredientName}
-                    onChange={(event) =>
-                      setEditingIngredientName(
-                        event.target.value
-                      )
-                    }
-                  />
-
-                  <input
-                    type="number"
-                    value={editingQuantity}
-                    onChange={(event) =>
-                      setEditingQuantity(
-                        event.target.value
-                      )
-                    }
-                  />
-
-                  <input
-                    type="text"
-                    value={editingUnit}
-                    onChange={(event) =>
-                      setEditingUnit(
-                        event.target.value
-                      )
-                    }
-                  />
-
-                  <button
-                    onClick={() =>
-                      handleEdit(item.id)
-                    }
-                  >
-                    Save
-                  </button>
-
-                  <button
-                    onClick={cancelEditing}
-                  >
-                    Cancel
-                  </button>
-
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <strong>
-                      {item.ingredient_name}
-                    </strong>
-
-                    <p>
-                      {item.quantity} {item.unit}
-                    </p>
-                  </div>
-
-                  <div className="pantry-actions">
-
-                    <button
-                      onClick={() =>
-                        startEditing(item)
-                      }
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        handleDelete(item.id)
-                      }
-                    >
-                      Delete
-                    </button>
-
-                  </div>
-                </>
-              )}
-            </div>
-          ))
+          <div className="pantry-table-wrapper">
+            <table className="pantry-table">
+              <thead>
+                <tr>
+                  <th>Ingredient</th>
+                  <th>Quantity</th>
+                  <th>Unit</th>
+                  <th style={{ textAlign: "right" }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pantryItems.map((item) => (
+                  <tr key={item.id}>
+                    <td className="item-name-cell">{item.ingredient_name}</td>
+                    <td>{item.quantity}</td>
+                    <td>{item.unit}</td>
+                    <td style={{ textAlign: "right" }}>
+                      <button
+                        onClick={() => handleDeleteItem(item.id)}
+                        className="btn-delete-stock"
+                        title="Delete from stock"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

@@ -183,3 +183,22 @@
   }
 
 }
+
+.shopping-list-button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 20px;
+  background: #7a4b2a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.shopping-list-button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
