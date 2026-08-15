@@ -1,147 +1,161 @@
-import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import "./RecipeDetails.css";
 
 function RecipeDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [recipe, setRecipe] = useState(null);
-
-  const handleAddToShoppingList = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:3001/shopping-lists/from-recipes",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            recipe_ids: [id],
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create shopping list");
-      }
-
-      console.log("Shopping list created:", data);
-
-      alert("Recipe added to shopping list!");
-    } catch (error) {
-      console.error("Failed to create shopping list:", error);
-      alert("Failed to add recipe to shopping list.");
-    }
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`http://localhost:3001/recipes/${id}`)
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((data) => {
         setRecipe(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load recipe details:", err);
+        setLoading(false);
       });
   }, [id]);
 
-  if (!recipe) {
-    return <p>Loading recipe...</p>;
+  if (loading) {
+    return <div className="recipe-details-container loading-state">Loading recipe...</div>;
   }
 
+  if (!recipe) {
+    return (
+      <div className="recipe-details-container error-state">
+        <h2>Recipe not found</h2>
+        <Link to="/" className="btn-back">← Back to Library</Link>
+      </div>
+    );
+  }
+
+  // Parse ingredients separated by newlines
+  const ingredientList = recipe.ingredients
+    ? recipe.ingredients.split("\n").filter((item) => item.trim().length > 0)
+    : [];
+
   return (
-    <div>
-      <Link to="/">
-        ← Back to recipes
-      </Link>
-
-      {recipe.image_url && (
-        <img
-          className="recipe-details-image"
-          src={recipe.image_url}
-          alt={recipe.name}
-        />
-      )}
-
-      <h1>{recipe.name}</h1>
-
-      <div className="details-stats">
+    <div className="recipe-details-container">
+      {/* Header Bar */}
+      <div className="recipe-details-header">
         <div>
-          <p>⏱ Prep Time</p>
-          <h3>{recipe.prep_time_minutes} mins</h3>
+          <Link to="/" className="back-link">← Back to Recipes</Link>
+          <h1>{recipe.name}</h1>
+          <div className="recipe-meta-badges">
+            <span className="badge-status">{recipe.status?.replace("_", " ")}</span>
+            {recipe.prep_time_minutes && (
+              <span className="badge-time">⏱️ Prep: {recipe.prep_time_minutes}m</span>
+            )}
+            {recipe.cook_time_minutes && (
+              <span className="badge-time">🍳 Cook: {recipe.cook_time_minutes}m</span>
+            )}
+            {recipe.tags && <span className="badge-tags">🏷️ {recipe.tags}</span>}
+          </div>
         </div>
 
-        <div>
-          <p>🔥 Cook Time</p>
-          <h3>{recipe.cook_time_minutes} mins</h3>
-        </div>
-
-        <div>
-          <p>Status</p>
-          <h3>{recipe.status}</h3>
+        <div className="header-action-buttons">
+          <Link to={`/recipes/${recipe.id}/edit`} className="btn-edit-recipe">
+            ✏️ Edit Recipe
+          </Link>
+          <button
+            onClick={() => navigate("/content-items/new", { state: { defaultRecipeId: recipe.id } })}
+            className="btn-schedule-content"
+          >
+            🎬 Schedule Content
+          </button>
         </div>
       </div>
 
-      {recipe.tags && (
-        <div className="recipe-details-tags">
-          {recipe.tags.split(",").map((tag, index) => (
-            <span key={index}>
-              {tag.trim()}
-            </span>
-          ))}
+      {/* Main Grid: Comparison & Recipe Specs */}
+      <div className="recipe-main-grid">
+        {/* Left Column: Ingredients & Method */}
+        <div className="recipe-info-card">
+          {recipe.image_url && (
+            <img
+              src={recipe.image_url}
+              alt={recipe.name}
+              className="recipe-detail-image"
+            />
+          )}
+
+          <div className="recipe-section">
+            <h2>🛒 Ingredients</h2>
+            {ingredientList.length === 0 ? (
+              <p className="empty-text">No ingredients listed.</p>
+            ) : (
+              <ul className="ingredients-checklist">
+                {ingredientList.map((ing, idx) => (
+                  <li key={idx}>{ing}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="recipe-section">
+            <h2>👩‍🍳 Method & Instructions</h2>
+            {recipe.method ? (
+              <div className="method-text">{recipe.method}</div>
+            ) : (
+              <p className="empty-text">No cooking instructions provided.</p>
+            )}
+          </div>
         </div>
-      )}
 
-      {recipe.ingredients && (
-        <section>
-          <h2>Ingredients</h2>
+        {/* Right Column: Dual View (Original vs Adjusted Recipe) */}
+        <div className="dual-view-card">
+          <h2>Recipe Transformation</h2>
+          <p className="dual-view-subtitle">
+            Side-by-side comparison between the inspiration source and your version.
+          </p>
 
-          <ul className="ingredients-list">
-            {recipe.ingredients.split("\n").map((ingredient, index) => (
-              <li key={index}>
-                {ingredient}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          <div className="comparison-grid">
+            {/* Original Source */}
+            <div className="comparison-box original">
+              <div className="comparison-header">
+                <h3>Original Recipe</h3>
+                {recipe.original_recipe_link && (
+                  <a
+                    href={recipe.original_recipe_link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="source-link"
+                  >
+                    View Link ↗
+                  </a>
+                )}
+              </div>
+              <div className="comparison-content">
+                {recipe.original_recipe_text ? (
+                  <pre>{recipe.original_recipe_text}</pre>
+                ) : (
+                  <p className="empty-text">No original recipe text saved.</p>
+                )}
+              </div>
+            </div>
 
-      {recipe.method && (
-        <section>
-          <h2>Cooking Method</h2>
-
-          <ol className="method-list">
-            {recipe.method.split("\n").map((step, index) => (
-              <li key={index}>
-                {step}
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
-      <section>
-        <h2>Original Recipe</h2>
-
-        <p className="recipe-text">
-          {recipe.original_recipe_text}
-        </p>
-      </section>
-
-      <section>
-        <h2>FreshlyPlated Version</h2>
-
-        <p className="recipe-text">
-          {recipe.adjusted_recipe_text}
-        </p>
-      </section>
-
-      <Link to={`/recipes/${recipe.id}/edit`}>
-        Edit Recipe
-      </Link>
-
-      <button className="shopping-list-button" onClick={handleAddToShoppingList}>
-        🛒 Add to Shopping List
-      </button>
+            {/* FreshlyPlated Adjusted Version */}
+            <div className="comparison-box adjusted">
+              <div className="comparison-header">
+                <h3>FreshlyPlated Version</h3>
+                <span className="adjusted-tag">Modified</span>
+              </div>
+              <div className="comparison-content">
+                {recipe.adjusted_recipe_text ? (
+                  <pre>{recipe.adjusted_recipe_text}</pre>
+                ) : (
+                  <p className="empty-text">No custom adjustments recorded yet.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

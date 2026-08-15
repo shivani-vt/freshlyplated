@@ -47,29 +47,64 @@ app.get("/recipes", async (req, res) => {
 
 //creates a new recipe 
 app.post("/recipes", async (req, res) => {
-    try {
-//information from frontend is stored in req.body
-  const { name, status, prep_time_minutes, cook_time_minutes, image_url } = req.body;
+  try {
+    // Extract all fields from the frontend payload
+    const {
+      name,
+      status,
+      prep_time_minutes,
+      cook_time_minutes,
+      image_url,
+      tags,
+      original_recipe_link,
+      original_recipe_text,
+      adjusted_recipe_text,
+      ingredients,
+      method,
+    } = req.body;
 
-  const result = await pool.query(
-    `
-    INSERT INTO recipes (name, status, prep_time_minutes, cook_time_minutes, image_url)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING *
-    `,
-    [name, status, prep_time_minutes, cook_time_minutes, image_url]
-  );
+    const result = await pool.query(
+      `
+      INSERT INTO recipes (
+        name,
+        status,
+        prep_time_minutes,
+        cook_time_minutes,
+        image_url,
+        tags,
+        original_recipe_link,
+        original_recipe_text,
+        adjusted_recipe_text,
+        ingredients,
+        method
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      RETURNING *
+      `,
+      [
+        name,
+        status || "planning",
+        prep_time_minutes || 0,
+        cook_time_minutes || 0,
+        image_url,
+        tags,
+        original_recipe_link,
+        original_recipe_text,
+        adjusted_recipe_text,
+        ingredients,
+        method,
+      ]
+    );
 
-  res.json(result.rows[0]);
-} catch (error) {
-console.error(error);
-
-res.status(500).json({
-    error: "Failed to create recipe"
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Failed to create recipe:", error);
+    res.status(500).json({
+      error: "Failed to create recipe",
+    });
+  }
 });
 
-}
-});
 //to retrieve a recipe with a specific ID 
 app.get("/recipes/:id", async (req, res) => {
   try {

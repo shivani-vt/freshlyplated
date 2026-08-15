@@ -19,6 +19,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedRecipes, setSelectedRecipes] = useState([]);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   function fetchRecipes() {
     fetch("http://localhost:3001/recipes")
@@ -166,16 +167,28 @@ function updateStatus(id, newStatus) {
         path="/"
         element={
           <div>
+            <div className="library-hero" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <div>
+                <h1>FreshlyPlated 🍽️</h1>
+                <p>Healthy recipes, takeaway favourites, and meal inspiration.</p>
+              </div>
 
-            <div className="intro">
-              <h1>FreshlyPlated 🍽️</h1>
-
-              <p>
-                Healthy recipes, takeaway favourites,
-                and meal inspiration.
-              </p>
-            </div>
-
+              <button
+                type="button"
+                onClick={() => setShowAddForm(!showAddForm)}
+                style={{
+                  background: "#7c3aed",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 18px",
+                  borderRadius: "10px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+              }}
+          >
+                {showAddForm ? "✕ Close Form" : "+ Add Recipe"}
+              </button>
+      </div>
             <input
               type="text"
               placeholder="Search recipes..."
@@ -224,12 +237,17 @@ function updateStatus(id, newStatus) {
               </div>
 
             </div>
+            {showAddForm && (
 
             <div className="add-recipe-section">
               <AddRecipeForm
-                fetchRecipes={fetchRecipes}
+                fetchRecipes={() => {
+                  fetchRecipes();
+                  setShowAddForm(false);
+                }}
               />
             </div>
+            )}
 
             {/* SHOPPING LIST CONTROLS */}
 
@@ -287,6 +305,7 @@ function updateStatus(id, newStatus) {
                     <RecipeCard
                       recipe={recipe}
                       deleteRecipe={deleteRecipe}
+                      onDelete={deleteRecipe}
                       updateStatus={updateStatus}
                     />
 

@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; 
 
 function CreateContentItem() {
+  const location = useLocation();
+  const defaultId = location.state?.defaultRecipeId || "";
   const [recipes, setRecipes] = useState([]);
+  const [recipeId, setRecipeId] = useState(defaultId);
 
-  const [recipeId, setRecipeId] = useState("");
   const [status, setStatus] = useState("planning");
   const [platform, setPlatform] = useState("TikTok");
   const [cookDate, setCookDate] = useState("");
