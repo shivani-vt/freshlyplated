@@ -758,68 +758,97 @@ app.delete("/pantry-items/:id", async (req, res) => {
 // Get dashboard information
 app.get("/dashboard", async (req, res) => {
   try {
-    // Count recipes
-    const recipesResult = await pool.query(
-      `
-      SELECT COUNT(*) AS count
-      FROM recipes
-      `
-    );
+    
+    const countsResult = await pool.query(`
+      SELECT 
+        (SELECT COUNT(*) FROM recipes) AS total_recipes,
+        (SELECT COUNT(*) FROM pantry_items) AS total_pantry_items,
+        (SELECT COUNT(*) FROM content_items) AS total_content_items,
+        (SELECT COUNT(*) FROM content_items WHERE status != 'published') AS pending_content
+    `);
 
-    // Count pantry items
-    const pantryResult = await pool.query(
-      `
-      SELECT COUNT(*) AS count
-      FROM pantry_items
-      `
-    );
-
-    // Count content items
-    const contentResult = await pool.query(
-      `
-      SELECT COUNT(*) AS count
+    const stagesResult = await pool.query(`
+      SELECT status, COUNT(*)::int AS count
       FROM content_items
-      `
-    );
+      GROUP BY status
+    `);
 
-    // Count content that still needs to be completed
-    const pendingResult = await pool.query(
-      `
-      SELECT COUNT(*) AS count
-      FROM content_items
-      WHERE status != 'published'
-      `
-    );
+    // Today's tasks (Cooking, Editing, Uploading)
+    const todaysTasksResult = await pool.query(`
+      SELECT 
+        c.*, 
+        r.name AS recipe_name,
+        CASE 
+          WHEN c.cook_date::date = CURRENT_DATE THEN 'cook'
+          WHEN c.edit_deadline::date = CURRENT_DATE THEN 'edit'
+          WHEN c.upload_date::date = CURRENT_DATE THEN 'upload'
+        END AS task_type
+      FROM content_items c
+      JOIN recipes r ON c.recipe_id = r.id
+      WHERE 
+        c.cook_date::date = CURRENT_DATE OR
+        c.edit_deadline::date = CURRENT_DATE OR
+        c.upload_date::date = CURRENT_DATE
+      ORDER BY c.created_at DESC
+    `);
 
-    // Get upcoming content
-    const upcomingResult = await pool.query(
-      `
-      SELECT
-        content_items.*,
-        recipes.name AS recipe_name
-      FROM content_items
-      JOIN recipes
-        ON content_items.recipe_id = recipes.id
-      WHERE upload_date >= CURRENT_DATE
-      ORDER BY upload_date ASC
-      LIMIT 5
-      `
+    // Upcoming schedule (Next 7 days)
+    const upcomingResult = await pool.query(`
+      SELECT 
+        c.*, 
+        r.name AS recipe_name
+      FROM content_items c
+      JOIN recipes r ON c.recipe_id = r.id
+      WHERE 
+        (c.cook_date > CURRENT_DATE AND c.cook_date <= CURRENT_DATE + INTERVAL '7 days') OR
+        (c.edit_deadline > CURRENT_DATE AND c.edit_deadline <= CURRENT_DATE + INTERVAL '7 days') OR
+        (c.upload_date > CURRENT_DATE AND c.upload_date <= CURRENT_DATE + INTERVAL '7 days')
+      ORDER BY LEAST(c.cook_date, c.edit_deadline, c.upload_date) ASC
+    `);
+
+    
+    const stageCounts = {
+      planning: 0,
+      ready_to_cook: 0,
+      editing: 0,
+      ready_to_upload: 0,
+      published: 0,
+    };
+
+    stagesResult.rows.forEach((row) => {
+      if (stageCounts[row.status] !== undefined) {
+        stageCounts[row.status] = row.count;
+      }
+    });
+
+    const todaysCooking = todaysTasksResult.rows.filter(
+      (item) => item.cook_date && item.cook_date.toISOString().split("T")[0] === new Date().toISOString().split("T")[0]
+    );
+    const todaysEditing = todaysTasksResult.rows.filter(
+      (item) => item.edit_deadline && item.edit_deadline.toISOString().split("T")[0] === new Date().toISOString().split("T")[0]
+    );
+    const todaysUploads = todaysTasksResult.rows.filter(
+      (item) => item.upload_date && item.upload_date.toISOString().split("T")[0] === new Date().toISOString().split("T")[0]
     );
 
     res.json({
-      recipes: Number(recipesResult.rows[0].count),
-      pantryItems: Number(pantryResult.rows[0].count),
-      contentItems: Number(contentResult.rows[0].count),
-      pendingContent: Number(pendingResult.rows[0].count),
-      upcomingContent: upcomingResult.rows
+      metrics: {
+        recipes: Number(countsResult.rows[0].total_recipes),
+        pantryItems: Number(countsResult.rows[0].total_pantry_items),
+        contentItems: Number(countsResult.rows[0].total_content_items),
+        pendingContent: Number(countsResult.rows[0].pending_content),
+      },
+      stageCounts,
+      todaysTasks: {
+        cooking: todaysCooking,
+        editing: todaysEditing,
+        uploads: todaysUploads,
+      },
+      upcomingContent: upcomingResult.rows,
     });
-
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Failed to fetch dashboard data"
-    });
+    console.error("Dashboard error:", error);
+    res.status(500).json({ error: "Failed to fetch dashboard data" });
   }
 });
 
