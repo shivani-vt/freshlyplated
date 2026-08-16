@@ -1,183 +1,141 @@
 .dashboard {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
 }
 
-.dashboard h1 {
-  font-size: 3rem;
-  margin-bottom: 5px;
-  color: #222;
+.dashboard-header {
+  margin-bottom: 32px;
 }
 
-.dashboard > p {
-  color: #ddd;
-  margin-bottom: 40px;
+.dashboard-header h1 {
+  color: #ffffff !important;
+  font-size: 2.2rem;
+}
+
+.dashboard-header p {
+  color: #94a3b8;
 }
 
 .dashboard-section {
-  margin-top: 30px;
+  margin-bottom: 40px;
 }
 
 .dashboard-section h2 {
-  margin-bottom: 20px;
-  color: white;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #cbd5e1 !important;
+  margin-bottom: 16px;
 }
 
-
-/*QUICK STATS*/
+/* Grids */
+.stats-grid,
+.progress-grid,
+.tasks-grid {
+  display: grid;
+  gap: 16px;
+}
 
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
-
-.stat-card {
-  background: white;
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  text-align: center;
-}
-
-.stat-card p {
-  color: #777;
-  margin-bottom: 10px;
-}
-
-.stat-card h3 {
-  font-size: 2.5rem;
-  margin: 0;
-  color: #7a4b2a;
-}
-
-
-/* =========================
-   CONTENT PROGRESS
-========================= */
 
 .progress-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
-.progress-card {
-  background: white;
-  padding: 20px 15px;
-  border-radius: 18px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  text-align: center;
+.tasks-grid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-.progress-card p {
-  margin: 0 0 10px;
-  color: #777;
-  font-size: 0.9rem;
+/* Dashboard Cards */
+.stat-card,
+.progress-card,
+.task-card,
+.upcoming-card {
+  background-color: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.progress-card p,
+.stat-card p {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 6px;
 }
 
 .progress-card h3 {
-  margin: 0;
-  font-size: 2rem;
-  color: #7a4b2a;
-}
-
-
-/*TODAY'S TASKS*/
-
-.tasks-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.task-card {
-  background: white;
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #f8fafc;
 }
 
 .task-card h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: #222;
+  color: #f1f5f9;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .task-item {
-  padding: 15px 0;
-  border-top: 1px solid #eee;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
 }
 
 .task-item strong {
-  color: #333;
+  color: #ffffff;
+  display: block;
+  font-size: 0.95rem;
 }
 
 .task-item p {
-  margin: 5px 0 0;
-  color: #777;
+  color: #8b5cf6;
+  font-weight: 600;
+  font-size: 0.8rem;
+  margin-top: 2px;
 }
 
+.empty-task-text {
+  color: #64748b;
+  font-style: italic;
+  font-size: 0.9rem;
+}
 
-/*UPCOMING TASKS*/
-
+/* Upcoming Schedule */
 .upcoming-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
 }
 
 .upcoming-card {
-  background: white;
-  padding: 20px 25px;
-  border-radius: 18px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .upcoming-card h3 {
-  margin: 0 0 5px;
-  color: #222;
+  color: #ffffff;
+  margin-bottom: 4px;
 }
 
 .upcoming-card p {
-  margin: 5px 0;
-  color: #777;
+  color: #8b5cf6;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 
-.upcoming-dates {
-  text-align: right;
-}
-
-
-/*MOBILE*/
-
-@media (max-width: 800px) {
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .progress-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .tasks-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .upcoming-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .upcoming-dates {
-    text-align: left;
-  }
-
+.upcoming-dates p {
+  color: #94a3b8;
+  font-size: 0.85rem;
 }
