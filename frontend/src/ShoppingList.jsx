@@ -43,7 +43,6 @@ function ShoppingList() {
   const toggleItemCheck = async (itemId, currentChecked) => {
     const nextChecked = !currentChecked;
 
-    // Optimistic UI update
     setItems((prev) =>
       prev.map((item) =>
         item.id === itemId ? { ...item, checked: nextChecked } : item
@@ -65,7 +64,6 @@ function ShoppingList() {
       }
     } catch (err) {
       console.error("Error updating checklist item:", err);
-      // Revert state on failure
       setItems((prev) =>
         prev.map((item) =>
           item.id === itemId ? { ...item, checked: currentChecked } : item
@@ -108,8 +106,7 @@ function ShoppingList() {
           <h3>No items to buy!</h3>
           <p>
             Select recipes from your <Link to="/">Recipe Library</Link> and click
-            <strong> "Create Shopping List"</strong>. Ingredients already in your{" "}
-            <Link to="/pantry">Pantry</Link> will be automatically subtracted.
+            <strong> "Create Shopping List"</strong>.
           </p>
         </div>
       ) : (
@@ -140,13 +137,15 @@ function ShoppingList() {
                 <input
                   type="checkbox"
                   checked={Boolean(item.checked)}
-                  onChange={() => {}} // Handled by li click
+                  onChange={() => {}}
                   className="item-checkbox"
                 />
                 <span className="item-name">{item.ingredient_name}</span>
-                <span className="item-qty">
-                  {item.quantity} {item.unit}
-                </span>
+                {item.quantity && item.unit && (
+                  <span className="item-qty">
+                    {item.quantity} {item.unit}
+                  </span>
+                )}
               </li>
             ))}
           </ul>

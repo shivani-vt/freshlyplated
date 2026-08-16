@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import "./RecipeCard.css";
 
-function RecipeCard({ recipe, onDelete }) {
+function RecipeCard({ recipe, onDelete, deleteRecipe }) {
+  if (!recipe) return null;
+
+  const handleDelete = onDelete || deleteRecipe;
+
   const formatStatus = (status) => {
     switch (status) {
       case "ready_to_cook":
@@ -13,7 +17,17 @@ function RecipeCard({ recipe, onDelete }) {
     }
   };
 
-  const totalTime = (recipe.prep_time_minutes || 0) + (recipe.cook_time_minutes || 0);
+  const totalTime = (Number(recipe.prep_time_minutes) || 0) + (Number(recipe.cook_time_minutes) || 0);
+
+  // Safe tag parsing
+  const tagsList = typeof recipe.tags === "string" 
+    ? recipe.tags.split(",").map((t) => t.trim()).filter(Boolean)
+    : Array.isArray(recipe.tags) ? recipe.tags : [];
+
+  // Safe ingredients count
+  const ingredientsCount = typeof recipe.ingredients === "string"
+    ? recipe.ingredients.split("\n").filter(Boolean).length
+    : 0;
 
   return (
     <div className="recipe-card-modern">
@@ -35,15 +49,15 @@ function RecipeCard({ recipe, onDelete }) {
       <div className="card-content">
         <div className="card-header-row">
           <Link to={`/recipes/${recipe.id}`} className="card-title-link">
-            <h3 className="card-title">{recipe.name}</h3>
+            <h3 className="card-title">{recipe.name || "Untitled Recipe"}</h3>
           </Link>
         </div>
 
-        {recipe.tags && (
+        {tagsList.length > 0 && (
           <div className="card-tags">
-            {recipe.tags.split(",").slice(0, 3).map((tag, i) => (
+            {tagsList.slice(0, 3).map((tag, i) => (
               <span key={i} className="tag-chip">
-                #{tag.trim()}
+                #{tag.replace(/^#/, "")}
               </span>
             ))}
           </div>
@@ -54,10 +68,10 @@ function RecipeCard({ recipe, onDelete }) {
             <span className="meta-icon">⏱️</span>
             <span>{totalTime > 0 ? `${totalTime} mins` : "Quick"}</span>
           </div>
-          {recipe.ingredients && (
+          {ingredientsCount > 0 && (
             <div className="meta-item">
               <span className="meta-icon">🛒</span>
-              <span>{recipe.ingredients.split("\n").filter(Boolean).length} items</span>
+              <span>{ingredientsCount} items</span>
             </div>
           )}
         </div>
@@ -66,9 +80,10 @@ function RecipeCard({ recipe, onDelete }) {
           <Link to={`/recipes/${recipe.id}`} className="btn-view">
             View Recipe
           </Link>
-          {onDelete && (
+          {handleDelete && (
             <button
-              onClick={() => onDelete(recipe.id)}
+              type="button"
+              onClick={() => handleDelete(recipe.id)}
               className="btn-delete-icon"
               title="Delete recipe"
             >
