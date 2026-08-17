@@ -1,88 +1,142 @@
+import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
 function Navbar() {
-  const navBarStyle = {
-    backgroundColor: "#ffffff",
-    borderBottom: "1px solid #e2e8f0",
-    position: "sticky",
-    top: 0,
-    zIndex: 1000,
-    width: "100%",
-    boxShadow: "0 1px 4px rgba(0, 0, 0, 0.04)",
-  };
-
-  const containerStyle = {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "0 24px",
-    height: "64px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  };
-
-  const logoStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    textDecoration: "none",
-    fontSize: "1.25rem",
-    fontWeight: "800",
-    color: "#0f172a",
-    letterSpacing: "-0.02em",
-  };
-
-  const linksGroupStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  };
-
-  const getLinkStyle = (isActive) => ({
-    textDecoration: "none",
-    fontSize: "0.92rem",
-    fontWeight: "600",
-    color: isActive ? "#7c3aed" : "#64748b",
-    backgroundColor: isActive ? "#f5f3ff" : "transparent",
-    padding: "8px 16px",
-    borderRadius: "10px",
-    transition: "all 0.2s ease",
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("app_theme") || "light";
   });
 
+  useEffect(() => {
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("app_theme", theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  }
+
+  const isDark = theme === "dark";
+
   return (
-    <header style={navBarStyle}>
-      <div style={containerStyle}>
-        <Link to="/" style={logoStyle}>
+    <header
+      style={{
+        backgroundColor: "var(--nav-bg)",
+        borderBottom: "1px solid var(--nav-border)",
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
+        width: "100%",
+        boxShadow: "var(--shadow-card)",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "0 24px",
+          height: "64px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Link
+          to="/"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            textDecoration: "none",
+            fontSize: "1.25rem",
+            fontWeight: "800",
+            color: "var(--text-main)",
+            letterSpacing: "-0.02em",
+          }}
+        >
           <span style={{ fontSize: "1.3rem" }}>🍽️</span>
           <span>FreshlyPlated</span>
         </Link>
 
-        <nav style={linksGroupStyle}>
-          <NavLink
-            to="/dashboard"
-            style={({ isActive }) => getLinkStyle(isActive)}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <nav style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <NavLink
+              to="/dashboard"
+              style={({ isActive }) => ({
+                textDecoration: "none",
+                fontSize: "0.92rem",
+                fontWeight: "600",
+                color: isActive ? "var(--primary)" : "var(--text-muted)",
+                backgroundColor: isActive ? "var(--primary-subtle)" : "transparent",
+                padding: "8px 14px",
+                borderRadius: "10px",
+              })}
+            >
+              📊 Dashboard
+            </NavLink>
+            <NavLink
+              to="/"
+              style={({ isActive }) => ({
+                textDecoration: "none",
+                fontSize: "0.92rem",
+                fontWeight: "600",
+                color: isActive ? "var(--primary)" : "var(--text-muted)",
+                backgroundColor: isActive ? "var(--primary-subtle)" : "transparent",
+                padding: "8px 14px",
+                borderRadius: "10px",
+              })}
+            >
+              📖 Recipes
+            </NavLink>
+            <NavLink
+              to="/content-tracker"
+              style={({ isActive }) => ({
+                textDecoration: "none",
+                fontSize: "0.92rem",
+                fontWeight: "600",
+                color: isActive ? "var(--primary)" : "var(--text-muted)",
+                backgroundColor: isActive ? "var(--primary-subtle)" : "transparent",
+                padding: "8px 14px",
+                borderRadius: "10px",
+              })}
+            >
+              🎬 Content Tracker
+            </NavLink>
+            <NavLink
+              to="/calendar"
+              style={({ isActive }) => ({
+                textDecoration: "none",
+                fontSize: "0.92rem",
+                fontWeight: "600",
+                color: isActive ? "var(--primary)" : "var(--text-muted)",
+                backgroundColor: isActive ? "var(--primary-subtle)" : "transparent",
+                padding: "8px 14px",
+                borderRadius: "10px",
+              })}
+            >
+              📅 Calendar
+            </NavLink>
+          </nav>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            style={{
+              background: "var(--bg-subtle)",
+              border: "1px solid var(--border-color)",
+              color: "var(--text-main)",
+              padding: "8px 14px",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontSize: "0.88rem",
+              fontWeight: "600",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
           >
-            📊 Dashboard
-          </NavLink>
-          <NavLink
-            to="/"
-            style={({ isActive }) => getLinkStyle(isActive)}
-          >
-            📖 Recipes
-          </NavLink>
-          <NavLink
-            to="/content-tracker"
-            style={({ isActive }) => getLinkStyle(isActive)}
-          >
-            🎬 Content Tracker
-          </NavLink>
-          <NavLink
-            to="/calendar"
-            style={({ isActive }) => getLinkStyle(isActive)}
-          >
-            📅 Calendar
-          </NavLink>
-        </nav>
+            {isDark ? "☀️ Light" : "🌙 Dark"}
+          </button>
+        </div>
       </div>
     </header>
   );

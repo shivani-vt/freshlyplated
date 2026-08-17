@@ -1,17 +1,33 @@
-/* --- CLEAN MODERN LIGHT PALETTE --- */
-:root {
-  --bg-page: #f8fafc;        
-  --bg-surface: #ffffff;    
-  --border-color: #e2e8f0;  
-  --text-main: #0f172a;      
-  --text-muted: #64748b;   
-  --primary: #7c3aed;       
+/* --- THEME DEFINITIONS --- */
+:root,
+body[data-theme="light"] {
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --border-color: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --nav-bg: #ffffff;
+  --nav-border: #e2e8f0;
+  --primary: #7c3aed;
   --primary-hover: #6d28d9;
   --primary-subtle: #f5f3ff;
-  --radius-lg: 16px;
-  --radius-md: 12px;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="dark"] {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-subtle: #334155;
+  --border-color: #334155;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --nav-bg: #1e293b;
+  --nav-border: #334155;
+  --primary: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --primary-subtle: rgba(139, 92, 246, 0.2);
+  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -19,6 +35,7 @@
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 body {
@@ -28,7 +45,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- MAIN LAYOUT CONTAINER --- */
+/* --- MAIN CONTAINER --- */
 .app-container,
 div:has(> .library-hero) {
   max-width: 1200px;
@@ -64,28 +81,26 @@ p {
   font-size: 0.95rem;
 }
 
-/* Controls */
+/* Search and Filter Inputs */
 input[type="text"],
 select {
-  background-color: var(--bg-surface);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   color: var(--text-main);
   padding: 10px 16px;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   font-size: 0.95rem;
   outline: none;
-  box-shadow: var(--shadow-sm);
-  margin-right: 12px;
-  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
 }
 
 input[type="text"]:focus,
 select:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 0 3px var(--primary-subtle);
 }
 
-/* Stat Cards in Recipe Library */
+/* Stats Summary Cards */
 .stats-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -94,18 +109,14 @@ select:focus {
 }
 
 .stat-card {
-  background-color: var(--bg-surface);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: 16px;
   padding: 20px 24px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
-
-.stat-card h3 {
-  font-size: 1.5rem;
 }
 
 .stat-card p {
@@ -123,13 +134,11 @@ select:focus {
   margin: 0;
 }
 
-
 .recipe-container {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
   width: 100%;
-  margin-top: 24px;
 }
 
 .recipe-wrapper {
@@ -141,13 +150,11 @@ select:focus {
 @media (max-width: 1024px) {
   .recipe-container {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
   }
 }
 
 @media (max-width: 640px) {
   .recipe-container {
     grid-template-columns: 1fr;
-    gap: 16px;
   }
 }

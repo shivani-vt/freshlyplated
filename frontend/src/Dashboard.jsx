@@ -8,194 +8,248 @@ function Dashboard() {
 
   useEffect(() => {
     fetch("http://localhost:3001/dashboard")
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((dashboardData) => {
         setData(dashboardData);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to load dashboard data:", err);
+        console.error("Failed to load dashboard:", err);
         setLoading(false);
       });
   }, []);
 
   if (loading) {
-    return <div className="dashboard loading-state">Loading dashboard...</div>;
+    return (
+      <div className="dashboard">
+        <p className="empty-task-text">Loading creator workspace...</p>
+      </div>
+    );
   }
 
-  if (!data) {
-    return <div className="dashboard error-state">Failed to load dashboard metrics.</div>;
-  }
-
-  // Safe destructuring with fallbacks
-  const metrics = data.metrics || { recipes: 0, contentItems: 0, pantryItems: 0 };
-  const stageCounts = data.stageCounts || {
+  const metrics = data?.metrics || { recipes: 0, contentItems: 0, pendingContent: 0 };
+  const stages = data?.stageCounts || {
     planning: 0,
     ready_to_cook: 0,
     editing: 0,
     ready_to_upload: 0,
     published: 0,
   };
+  const todaysTasks = data?.todaysTasks || { cooking: [], editing: [], uploads: [] };
+  const upcomingContent = data?.upcomingContent || [];
 
-  // Normalize todaysTasks whether it arrives as an object or a flat array
-  const rawTasks = data.todaysTasks;
-  const isArray = Array.isArray(rawTasks);
-  
-  const cookingTasks = isArray 
-    ? rawTasks.filter((t) => t.task_type === "cook")
-    : rawTasks?.cooking || [];
-
-  const editingTasks = isArray
-    ? rawTasks.filter((t) => t.task_type === "edit")
-    : rawTasks?.editing || [];
-
-  const uploadTasks = isArray
-    ? rawTasks.filter((t) => t.task_type === "upload")
-    : rawTasks?.uploads || [];
-
-  const upcomingList = Array.isArray(data.upcomingContent) ? data.upcomingContent : [];
+  const publishedCount = stages.published || 0;
 
   return (
     <div className="dashboard">
-      <h1>FreshlyPlatedOS</h1>
-      <p>Welcome back 👋</p>
+      {/* HEADER & QUICK ACTIONS */}
+      <div className="dashboard-header-row">
+        <div>
+          <h1>FreshlyPlated Creator Studio 🎬</h1>
+          <p>Your production pipeline, daily task radar, and publishing schedule.</p>
+        </div>
 
-      {/* QUICK STATS */}
-      <section className="dashboard-section">
-        <h2>Quick Stats</h2>
+        <div className="dashboard-actions">
+          <Link to="/content-items/new" className="btn-primary-action">
+            + Schedule Post
+          </Link>
+          <Link to="/" className="btn-secondary-action">
+            + Add Recipe
+          </Link>
+        </div>
+      </div>
+
+      {/* CORE KPI SUMMARY */}
+      <div className="dashboard-section">
+        <h2>Performance Snapshot</h2>
         <div className="stats-grid">
-          <div className="stat-card">
-            <p>Recipes Saved</p>
-            <h3>{metrics.recipes ?? 0}</h3>
+          <div className="metric-card">
+            <div className="metric-header">
+              <span>📚</span>
+              <p>Recipe Vault</p>
+            </div>
+            <h3>{metrics.recipes}</h3>
+            <span className="metric-subtext">Total catalogued recipes</span>
           </div>
 
-          <div className="stat-card">
-            <p>Content Pipeline</p>
-            <h3>{metrics.contentItems ?? 0}</h3>
+          <div className="metric-card">
+            <div className="metric-header">
+              <span>⏳</span>
+              <p>In Production</p>
+            </div>
+            <h3>{metrics.pendingContent}</h3>
+            <span className="metric-subtext">Active content in pipeline</span>
           </div>
 
-          <div className="stat-card">
-            <p>Pantry Stock</p>
-            <h3>{metrics.pantryItems ?? 0}</h3>
-          </div>
-        </div>
-      </section>
-
-      {/* CONTENT PROGRESS */}
-      <section className="dashboard-section">
-        <h2>Content Progress</h2>
-        <div className="progress-grid">
-          <div className="progress-card">
-            <p>📝 Planning</p>
-            <h3>{stageCounts.planning ?? 0}</h3>
-          </div>
-
-          <div className="progress-card">
-            <p>🍳 Ready to Cook</p>
-            <h3>{stageCounts.ready_to_cook ?? 0}</h3>
-          </div>
-
-          <div className="progress-card">
-            <p>🎬 Editing</p>
-            <h3>{stageCounts.editing ?? 0}</h3>
-          </div>
-
-          <div className="progress-card">
-            <p>📤 Ready to Upload</p>
-            <h3>{stageCounts.ready_to_upload ?? 0}</h3>
-          </div>
-
-          <div className="progress-card">
-            <p>🎉 Published</p>
-            <h3>{stageCounts.published ?? 0}</h3>
+          <div className="metric-card">
+            <div className="metric-header">
+              <span>🎉</span>
+              <p>Published Posts</p>
+            </div>
+            <h3>{publishedCount}</h3>
+            <span className="metric-subtext">Live on social platforms</span>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* TODAY'S TASKS */}
-      <section className="dashboard-section">
-        <h2>Today's Tasks</h2>
+      {/* PRODUCTION FUNNEL */}
+      <div className="dashboard-section">
+        <h2>Content Pipeline Stages</h2>
+        <div className="funnel-grid">
+          <Link to="/content-tracker" className="funnel-card planning">
+            <span className="funnel-icon">📝</span>
+            <div className="funnel-details">
+              <p>Planning</p>
+              <h3>{stages.planning}</h3>
+            </div>
+          </Link>
+
+          <Link to="/content-tracker" className="funnel-card cook">
+            <span className="funnel-icon">🍳</span>
+            <div className="funnel-details">
+              <p>Ready to Cook</p>
+              <h3>{stages.ready_to_cook}</h3>
+            </div>
+          </Link>
+
+          <Link to="/content-tracker" className="funnel-card edit">
+            <span className="funnel-icon">🎬</span>
+            <div className="funnel-details">
+              <p>Editing</p>
+              <h3>{stages.editing}</h3>
+            </div>
+          </Link>
+
+          <Link to="/content-tracker" className="funnel-card upload">
+            <span className="funnel-icon">🚀</span>
+            <div className="funnel-details">
+              <p>Ready to Upload</p>
+              <h3>{stages.ready_to_upload}</h3>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* TODAY'S FOCUS */}
+      <div className="dashboard-section">
+        <h2>Today&apos;s Focus</h2>
         <div className="tasks-grid">
-          {/* COOK TODAY */}
+          {/* Cooking Today */}
           <div className="task-card">
-            <h3>🍳 Cook Today</h3>
-            {cookingTasks.length === 0 ? (
-              <p className="empty-task-text">Nothing scheduled.</p>
+            <div className="task-card-title">
+              <span>🍳</span>
+              <h3>Cook Today</h3>
+              <span className="badge-count">{todaysTasks.cooking.length}</span>
+            </div>
+            {todaysTasks.cooking.length === 0 ? (
+              <p className="empty-task-text">No shoots scheduled for today.</p>
             ) : (
-              cookingTasks.map((item) => (
+              todaysTasks.cooking.map((item) => (
                 <div key={item.id} className="task-item">
-                  <strong>{item.recipe_name}</strong>
-                  <p>{item.platform}</p>
+                  <div className="task-item-main">
+                    <strong>{item.recipe_name || "Untitled Recipe"}</strong>
+                    <span className="platform-tag">{item.platform}</span>
+                  </div>
+                  {item.hook && <p className="task-hook">&ldquo;{item.hook}&rdquo;</p>}
+                  <Link to={`/content-items/${item.id}/edit`} className="task-link">
+                    Open Task →
+                  </Link>
                 </div>
               ))
             )}
           </div>
 
-          {/* EDIT TODAY */}
+          {/* Editing Today */}
           <div className="task-card">
-            <h3>🎬 Edit Today</h3>
-            {editingTasks.length === 0 ? (
-              <p className="empty-task-text">Nothing scheduled.</p>
+            <div className="task-card-title">
+              <span>🎬</span>
+              <h3>Edit Deadlines</h3>
+              <span className="badge-count">{todaysTasks.editing.length}</span>
+            </div>
+            {todaysTasks.editing.length === 0 ? (
+              <p className="empty-task-text">No editing deadlines today.</p>
             ) : (
-              editingTasks.map((item) => (
+              todaysTasks.editing.map((item) => (
                 <div key={item.id} className="task-item">
-                  <strong>{item.recipe_name}</strong>
-                  <p>{item.platform}</p>
+                  <div className="task-item-main">
+                    <strong>{item.recipe_name || "Untitled Recipe"}</strong>
+                    <span className="platform-tag">{item.platform}</span>
+                  </div>
+                  {item.hook && <p className="task-hook">&ldquo;{item.hook}&rdquo;</p>}
+                  <Link to={`/content-items/${item.id}/edit`} className="task-link">
+                    Open Task →
+                  </Link>
                 </div>
               ))
             )}
           </div>
 
-          {/* UPLOAD TODAY */}
+          {/* Uploads Today */}
           <div className="task-card">
-            <h3>📤 Upload Today</h3>
-            {uploadTasks.length === 0 ? (
-              <p className="empty-task-text">Nothing scheduled.</p>
+            <div className="task-card-title">
+              <span>🚀</span>
+              <h3>Uploads Today</h3>
+              <span className="badge-count">{todaysTasks.uploads.length}</span>
+            </div>
+            {todaysTasks.uploads.length === 0 ? (
+              <p className="empty-task-text">No uploads due today.</p>
             ) : (
-              uploadTasks.map((item) => (
+              todaysTasks.uploads.map((item) => (
                 <div key={item.id} className="task-item">
-                  <strong>{item.recipe_name}</strong>
-                  <p>{item.platform}</p>
+                  <div className="task-item-main">
+                    <strong>{item.recipe_name || "Untitled Recipe"}</strong>
+                    <span className="platform-tag">{item.platform}</span>
+                  </div>
+                  {item.hook && <p className="task-hook">&ldquo;{item.hook}&rdquo;</p>}
+                  <Link to={`/content-items/${item.id}/edit`} className="task-link">
+                    Open Task →
+                  </Link>
                 </div>
               ))
             )}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* UPCOMING 7 DAYS */}
-      <section className="dashboard-section">
-        <h2>Upcoming — Next 7 Days</h2>
-        <div className="upcoming-list">
-          {upcomingList.length === 0 ? (
-            <p className="empty-task-text">No upcoming tasks for the next 7 days.</p>
-          ) : (
-            upcomingList.map((item) => (
-              <div key={item.id} className="upcoming-card">
-                <div>
-                  <h3>{item.recipe_name}</h3>
-                  <p>{item.platform}</p>
+      {/* 7-DAY RADAR */}
+      <div className="dashboard-section">
+        <h2>Upcoming Content Radar (Next 7 Days)</h2>
+        {upcomingContent.length === 0 ? (
+          <div className="empty-radar-box">
+            <p>Your schedule is clear for the next 7 days.</p>
+            <Link to="/content-items/new" className="text-link">
+              Schedule your next video →
+            </Link>
+          </div>
+        ) : (
+          <div className="upcoming-list">
+            {upcomingContent.map((item) => (
+              <div key={item.id} className="upcoming-item-row">
+                <div className="upcoming-main-info">
+                  <strong>{item.recipe_name || "Untitled Recipe"}</strong>
+                  <span className="platform-pill">{item.platform}</span>
+                  <span className="stage-pill">{item.status.replace(/_/g, " ")}</span>
                 </div>
 
-                <div className="upcoming-dates">
+                <div className="upcoming-dates-group">
                   {item.cook_date && (
-                    <p>🍳 Cook: {new Date(item.cook_date).toLocaleDateString()}</p>
+                    <span>🍳 Cook: {new Date(item.cook_date).toLocaleDateString()}</span>
                   )}
                   {item.edit_deadline && (
-                    <p>🎬 Edit: {new Date(item.edit_deadline).toLocaleDateString()}</p>
+                    <span>🎬 Edit: {new Date(item.edit_deadline).toLocaleDateString()}</span>
                   )}
                   {item.upload_date && (
-                    <p>📤 Upload: {new Date(item.upload_date).toLocaleDateString()}</p>
+                    <span>🚀 Post: {new Date(item.upload_date).toLocaleDateString()}</span>
                   )}
+                  <Link to={`/content-items/${item.id}/edit`} className="btn-mini-edit">
+                    Edit
+                  </Link>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      </section>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
