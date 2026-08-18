@@ -134,23 +134,42 @@ function App() {
                   {showAddForm ? "✕ Close Form" : "+ Add Recipe"}
                 </button>
               </div>
-
+              
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  marginBottom: "24px",
+                  width: "100%",
+                }}
+              >
               <input
                 type="text"
-                placeholder="Search recipes..."
+                placeholder="🔍 Search recipes by title or tags..."
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
+                style={{
+                  flex: "1",
+                  marginRight: 0,
+                  marginBottom: 0,
+                }}
               />
 
               <select
                 value={selectedStatus}
                 onChange={(event) => setSelectedStatus(event.target.value)}
+                style={{
+                  minWidth: "160px",
+                  marginRight: 0,
+                  marginBottom: 0,
+                }}
               >
-                <option value="all">All</option>
+                <option value="all">All Statuses</option>
                 <option value="planning">Planning</option>
                 <option value="cooking">Cooking</option>
                 <option value="completed">Completed</option>
               </select>
+            </div>
 
               <div className="stats-container">
                 <div className="stat-card">

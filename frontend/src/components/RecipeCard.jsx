@@ -1,95 +1,64 @@
 import { Link } from "react-router-dom";
 import "./RecipeCard.css";
 
-function RecipeCard({ recipe, onDelete, deleteRecipe }) {
-  if (!recipe) return null;
-
-  const handleDelete = onDelete || deleteRecipe;
-
-  const formatStatus = (status) => {
-    switch (status) {
-      case "ready_to_cook":
-        return "Ready to Cook";
-      case "ready_to_upload":
-        return "Ready to Upload";
-      default:
-        return status ? status.charAt(0).toUpperCase() + status.slice(1) : "Draft";
-    }
-  };
-
-  const totalTime = (Number(recipe.prep_time_minutes) || 0) + (Number(recipe.cook_time_minutes) || 0);
-
-  // Safe tag parsing
-  const tagsList = typeof recipe.tags === "string" 
-    ? recipe.tags.split(",").map((t) => t.trim()).filter(Boolean)
-    : Array.isArray(recipe.tags) ? recipe.tags : [];
-
-  // Safe ingredients count
-  const ingredientsCount = typeof recipe.ingredients === "string"
-    ? recipe.ingredients.split("\n").filter(Boolean).length
-    : 0;
+function RecipeCard({ recipe, onDelete }) {
+  const tagsArray = Array.isArray(recipe.tags)
+    ? recipe.tags
+    : recipe.tags
+    ? recipe.tags.split(",").map((t) => t.trim())
+    : [];
 
   return (
-    <div className="recipe-card-modern">
-      <Link to={`/recipes/${recipe.id}`} className="card-image-link">
-        <div className="card-image-wrapper">
-          {recipe.image_url ? (
-            <img src={recipe.image_url} alt={recipe.name} className="card-image" />
-          ) : (
-            <div className="card-image-placeholder">
-              <span>🍳</span>
-            </div>
-          )}
-          <span className={`status-pill status-${recipe.status || "planning"}`}>
-            {formatStatus(recipe.status)}
-          </span>
-        </div>
-      </Link>
+    <div className="recipe-card">
+      <div className="recipe-card-image-wrapper">
+        {recipe.image_url ? (
+          <img
+            src={recipe.image_url}
+            alt={recipe.name}
+            className="recipe-card-image"
+          />
+        ) : (
+          <div className="recipe-card-placeholder">🍽️</div>
+        )}
 
-      <div className="card-content">
-        <div className="card-header-row">
-          <Link to={`/recipes/${recipe.id}`} className="card-title-link">
-            <h3 className="card-title">{recipe.name || "Untitled Recipe"}</h3>
-          </Link>
-        </div>
+        <span className={`recipe-status-pill ${recipe.status || "planning"}`}>
+          {recipe.status || "planning"}
+        </span>
+      </div>
 
-        {tagsList.length > 0 && (
-          <div className="card-tags">
-            {tagsList.slice(0, 3).map((tag, i) => (
-              <span key={i} className="tag-chip">
+      <div className="recipe-card-body">
+        <h3 className="recipe-card-title">{recipe.name}</h3>
+
+        {tagsArray.length > 0 && (
+          <div className="recipe-tags-list">
+            {tagsArray.map((tag, index) => (
+              <span key={index} className="recipe-tag">
                 #{tag.replace(/^#/, "")}
               </span>
             ))}
           </div>
         )}
 
-        <div className="card-meta">
-          <div className="meta-item">
-            <span className="meta-icon">⏱️</span>
-            <span>{totalTime > 0 ? `${totalTime} mins` : "Quick"}</span>
-          </div>
-          {ingredientsCount > 0 && (
-            <div className="meta-item">
-              <span className="meta-icon">🛒</span>
-              <span>{ingredientsCount} items</span>
-            </div>
+        <div className="recipe-meta-row">
+          {(recipe.cook_time_minutes || recipe.prep_time_minutes) && (
+            <span>
+              ⏱️ {Number(recipe.prep_time_minutes || 0) + Number(recipe.cook_time_minutes || 0)} mins
+            </span>
           )}
         </div>
 
-        <div className="card-actions">
-          <Link to={`/recipes/${recipe.id}`} className="btn-view">
+        <div className="recipe-actions-row">
+          <Link to={`/recipes/${recipe.id}`} className="btn-view-recipe">
             View Recipe
           </Link>
-          {handleDelete && (
-            <button
-              type="button"
-              onClick={() => handleDelete(recipe.id)}
-              className="btn-delete-icon"
-              title="Delete recipe"
-            >
-              🗑️
-            </button>
-          )}
+          <button
+            type="button"
+            className="btn-delete-recipe"
+            onClick={() => onDelete(recipe.id)}
+            title="Delete Recipe"
+          >
+            🗑️
+          </button>
         </div>
       </div>
     </div>
